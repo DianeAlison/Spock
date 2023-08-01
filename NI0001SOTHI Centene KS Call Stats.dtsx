@@ -1,0 +1,995 @@
+<?xml version="1.0"?><DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts" DTS:refId="Package" DTS:CreationDate="11/3/2016 12:36:50 PM" DTS:CreationName="Microsoft.Package" DTS:CreatorComputerName="MO010009NTH8Y1D" DTS:CreatorName="MBH\naschultz" DTS:DTSID="{FB1241C4-83B1-484B-B16A-F5A53D8D15C2}" DTS:EnableConfig="True" DTS:ExecutableType="Microsoft.Package" DTS:LastModifiedProductVersion="12.0.6024.0" DTS:LocaleID="1033" DTS:ObjectName="NI0001SOTHI Centene KS Call Stats" DTS:PackageType="5" DTS:ProtectionLevel="5" DTS:VersionBuild="34" DTS:VersionGUID="{E2CD0808-DFBF-46C8-941B-0F3D00BFA9AB}">
+  <DTS:Property DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager DTS:refId="Package.ConnectionManagers[Excel Connection Manager]" DTS:CreationName="EXCEL" DTS:DTSID="{396E153D-665D-4A72-9D8E-6B44B3CAFA4C}" DTS:ObjectName="Excel Connection Manager">
+      <DTS:PropertyExpression DTS:Name="ExcelFilePath">@[User::SaveFileFullName]</DTS:PropertyExpression>
+      <DTS:ObjectData>
+        <DTS:ConnectionManager DTS:ConnectionString="Provider=Microsoft.ACE.OLEDB.12.0;Data Source=;Extended Properties=&quot;EXCEL 8.0;HDR=YES&quot;;"/>
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager DTS:refId="Package.ConnectionManagers[nile-r1.adhoc]" DTS:CreationName="OLEDB" DTS:DTSID="{B6DF6CBA-4A05-4DEB-80BF-E775668963CD}" DTS:ObjectName="nile-r1.adhoc">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager DTS:ConnectionString="Data Source=nile-r1;Initial Catalog=adhoc;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;"/>
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager DTS:refId="Package.ConnectionManagers[SMTP Connection Manager]" DTS:CreationName="SMTP" DTS:DTSID="{F2B92CD0-A98A-4AF7-ABD1-DBB5A7311C3A}" DTS:ObjectName="SMTP Connection Manager">
+      <DTS:ObjectData>
+        <SmtpConnectionManager ConnectionString="SmtpServer=relay.magellanhealth.com;UseWindowsAuthentication=False;EnableSsl=False;"/>
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager DTS:refId="Package.ConnectionManagers[SSISConfigurations]" DTS:CreationName="OLEDB" DTS:DTSID="{0C1BC271-EF1A-43E3-AD4D-8FFF65439018}" DTS:ObjectName="SSISConfigurations">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager DTS:ConnectionString="Data Source=STLMOSQLDEV301;Initial Catalog=ASDSSISConfigurations;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;"/>
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager DTS:refId="Package.ConnectionManagers[STLMOSQL102.ASDUtilityReports]" DTS:CreationName="OLEDB" DTS:DTSID="{E5B4BC3B-F1EE-4F09-9D88-2C21F5B61AE8}" DTS:ObjectName="STLMOSQL102.ASDUtilityReports">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager DTS:ConnectionString="Initial Catalog=ASDUtilityReports;&#xA;Data Source=MHCReporting-P;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;"/>
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
+  <DTS:Configurations>
+    <DTS:Configuration DTS:ConfigurationString="ASD_SSIS_CONFIG_CONNECTION_STRING" DTS:ConfigurationType="2" DTS:ConfigurationVariable="\Package.Connections[SSISConfigurations].Properties[ConnectionString]" DTS:CreationName="" DTS:DTSID="{51826C54-E799-4233-ACB2-0984A2C11AF7}" DTS:ObjectName="Configuration 1"/>
+    <DTS:Configuration DTS:ConfigurationString="&quot;SSISConfigurations&quot;;&quot;[dbo].[SSISConfigurations]&quot;;&quot;NI0001SOTHI Centene KS Call Stats&quot;;" DTS:ConfigurationType="7" DTS:CreationName="" DTS:DTSID="{12947D6F-0026-480C-AC9D-29E1673E49EC}" DTS:ObjectName="NI0001SOTHI  Prod Configs"/>
+  </DTS:Configurations>
+  <DTS:Variables>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{37D4C0F8-0062-430F-A02D-D5978AFA24C2}" DTS:IncludeInDebugDump="2345" DTS:Namespace="User" DTS:ObjectName="AccountIdentifier">
+      <DTS:VariableValue DTS:DataType="8" xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{AB86A5E7-1F02-42A6-A8CE-45F7252DF765}" DTS:IncludeInDebugDump="2345" DTS:Namespace="User" DTS:ObjectName="Approval">
+      <DTS:VariableValue DTS:DataType="8" xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{689F62AF-D5D2-481F-9DC0-CC17323806E9}" DTS:IncludeInDebugDump="2345" DTS:Namespace="User" DTS:ObjectName="EmailAddresses">
+      <DTS:VariableValue DTS:DataType="8" xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{1BA802A3-4DFE-4CAA-904D-FD64626524B9}" DTS:IncludeInDebugDump="2345" DTS:Namespace="User" DTS:ObjectName="EmailAddressesBCC">
+      <DTS:VariableValue DTS:DataType="8" xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{E146FAC0-3A9D-43EA-A19F-D08F433B3FB8}" DTS:IncludeInDebugDump="2345" DTS:Namespace="User" DTS:ObjectName="EmailAddressesCC">
+      <DTS:VariableValue DTS:DataType="8" xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{2A561570-135D-42A4-96CA-C4BD95F34E0C}" DTS:IncludeInDebugDump="2345" DTS:Namespace="User" DTS:ObjectName="Frequency">
+      <DTS:VariableValue DTS:DataType="8" xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{002F7D5B-545B-47BB-A08D-7882112DC6CD}" DTS:IncludeInDebugDump="2345" DTS:Namespace="User" DTS:ObjectName="QAEmailAddresses">
+      <DTS:VariableValue DTS:DataType="8" xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{A1DC84F1-2049-4DB6-AB62-A8E152848BB7}" DTS:IncludeInDebugDump="2345" DTS:Namespace="User" DTS:ObjectName="ReportID">
+      <DTS:VariableValue DTS:DataType="8" xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{6D65BB50-3D46-4F53-895E-C3FFF92BC416}" DTS:IncludeInDebugDump="2345" DTS:Namespace="User" DTS:ObjectName="SaveFile">
+      <DTS:VariableValue DTS:DataType="8">\\stlmofs\shared\ASD\AppData\SSIS\SSISFiles\Dev\SSISTemplates\NI0001SOTHI Centene KS Call Stats\</DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{31BABB6F-0ECA-42D0-94B1-79FB33B5677C}" DTS:IncludeInDebugDump="2345" DTS:Namespace="User" DTS:ObjectName="SaveFileFullName">
+      <DTS:VariableValue DTS:DataType="8" xml:space="preserve"></DTS:VariableValue>
+    </DTS:Variable>
+    <DTS:Variable DTS:CreationName="" DTS:DTSID="{EDF48B73-E193-414C-AE17-EDD0BA1A294B}" DTS:IncludeInDebugDump="2345" DTS:Namespace="User" DTS:ObjectName="Template">
+      <DTS:VariableValue DTS:DataType="8">\\stlmofs\shared\ASD\AppData\SSIS\SSISFiles\Dev\SSISTemplates\NI0001SOTHI Centene KS Call Stats\NI0001SOTHI Centene KS Call Stats.xls</DTS:VariableValue>
+    </DTS:Variable>
+  </DTS:Variables>
+  <DTS:Executables>
+    <DTS:Executable DTS:refId="Package\Send Mail Task" DTS:CreationName="Microsoft.SendMailTask" DTS:DelayValidation="True" DTS:Description="Send Mail Task" DTS:DTSID="{2712BA8E-45B1-4B24-9502-8A4CD1ACF4AB}" DTS:ExecutableType="Microsoft.SendMailTask" DTS:LocaleID="-1" DTS:ObjectName="Send Mail Task" DTS:TaskContact="Send Mail Task; Microsoft Corporation; Microsoft SQL Server v9; © 2004 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1" DTS:ThreadHint="0">
+      <DTS:Variables/>
+      <DTS:PropertyExpression DTS:Name="CCLine">@[User::EmailAddressesCC]</DTS:PropertyExpression>
+      <DTS:PropertyExpression DTS:Name="FileAttachments">@[User::SaveFileFullName]</DTS:PropertyExpression>
+      <DTS:PropertyExpression DTS:Name="ToLine">@[User::EmailAddresses]</DTS:PropertyExpression>
+      <DTS:ObjectData>
+        <SendMailTask:SendMailTaskData SendMailTask:SMTPServer="{F2B92CD0-A98A-4AF7-ABD1-DBB5A7311C3A}" SendMailTask:From="ASDreporting@magellanhealth.com" SendMailTask:Subject="NI0001SOTHI Centene KS Call Stats" xmlns:SendMailTask="www.microsoft.com/sqlserver/dts/tasks/sendmailtask"/>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Send Mail Task QA" DTS:CreationName="Microsoft.SendMailTask" DTS:DelayValidation="True" DTS:Description="Send Mail Task" DTS:DTSID="{3C115F8D-CA3A-4ECB-8A21-B256A0B0949A}" DTS:ExecutableType="Microsoft.SendMailTask" DTS:LocaleID="-1" DTS:ObjectName="Send Mail Task QA" DTS:TaskContact="Send Mail Task; Microsoft Corporation; Microsoft SQL Server v9; © 2004 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1" DTS:ThreadHint="1">
+      <DTS:Variables/>
+      <DTS:PropertyExpression DTS:Name="CCLine">@[User::EmailAddressesCC]</DTS:PropertyExpression>
+      <DTS:PropertyExpression DTS:Name="FileAttachments">@[User::SaveFileFullName]</DTS:PropertyExpression>
+      <DTS:PropertyExpression DTS:Name="MessageSource">"EmailAddresses: " +  @[User::EmailAddresses]  + "\nBCC EmailAddresses: " + @[User::EmailAddressesBCC] + "\nCC EmailAddresses: " +  @[User::EmailAddressesCC]</DTS:PropertyExpression>
+      <DTS:PropertyExpression DTS:Name="ToLine">@[User::QAEmailAddresses]</DTS:PropertyExpression>
+      <DTS:ObjectData>
+        <SendMailTask:SendMailTaskData SendMailTask:SMTPServer="{F2B92CD0-A98A-4AF7-ABD1-DBB5A7311C3A}" SendMailTask:From="ASDreporting@magellanhealth.com" SendMailTask:Subject="NI0001SOTHI Centene KS Call Stats" SendMailTask:MessageSource="EmailAddresses: &#xA;BCC EmailAddresses: &#xA;CC EmailAddresses: " xmlns:SendMailTask="www.microsoft.com/sqlserver/dts/tasks/sendmailtask"/>
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable DTS:refId="Package\Sequence Container" DTS:CreationName="STOCK:SEQUENCE" DTS:Description="Sequence Container" DTS:DTSID="{3E54E5F8-96E5-4E0A-B7B0-98113AACF180}" DTS:ExecutableType="STOCK:SEQUENCE" DTS:LocaleID="-1" DTS:ObjectName="Sequence Container">
+      <DTS:Variables/>
+      <DTS:Executables>
+        <DTS:Executable DTS:refId="Package\Sequence Container\Data Flow Task" DTS:CreationName="Microsoft.Pipeline" DTS:DelayValidation="True" DTS:Description="Data Flow Task" DTS:DTSID="{CC838C51-008C-4DF1-96A7-F40A04BB34A4}" DTS:ExecutableType="Microsoft.Pipeline" DTS:LocaleID="-1" DTS:ObjectName="Data Flow Task" DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server v9; (C) 2004 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+          <DTS:Variables/>
+          <DTS:ObjectData>
+            <pipeline BLOBTempStoragePath="" bufferTempStoragePath="" engineThreads="5" version="1">
+              <components>
+                <component refId="Package\Sequence Container\Data Flow Task\Data Conversion" componentClassID="Microsoft.DataConvert" contactInfo="Data Conversion;Microsoft Corporation;Microsoft SqlServer v9; (C) 2005 Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0" description="Data Conversion" name="Data Conversion" usesDispositions="true">
+                  <inputs>
+                    <input refId="Package\Sequence Container\Data Flow Task\Data Conversion.Inputs[Data Conversion Input]" name="Data Conversion Input">
+                      <inputColumns>
+                        <inputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion.Inputs[Data Conversion Input].Columns[Call reason]" cachedCodepage="1252" cachedDataType="str" cachedLength="255" cachedName="Call reason" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].Columns[Call reason]"/>
+                        <inputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion.Inputs[Data Conversion Input].Columns[Call count]" cachedDataType="i4" cachedName="Call count" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].Columns[Call count]"/>
+                        <inputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion.Inputs[Data Conversion Input].Columns[% of calls]" cachedDataType="numeric" cachedName="% of calls" cachedPrecision="10" cachedScale="2" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].Columns[% of calls]"/>
+                      </inputColumns>
+                      <externalMetadataColumns/>
+                    </input>
+                  </inputs>
+                  <outputs>
+                    <output refId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Output]" exclusionGroup="1" name="Data Conversion Output" synchronousInputId="Package\Sequence Container\Data Flow Task\Data Conversion.Inputs[Data Conversion Input]">
+                      <outputColumns>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of Call reason]" dataType="wstr" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" length="255" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of Call reason]" name="Copy of Call reason" truncationRowDisposition="FailComponent">
+                          <properties>
+                            <property containsID="true" dataType="System.Int32" description="Specifies the input column used as the source of data for the conversion." name="SourceInputColumnLineageID">#{Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].Columns[Call reason]}</property>
+                            <property dataType="System.Boolean" description="Indicates whether the column uses the faster, locale-neutral parsing routines." name="FastParse">false</property>
+                          </properties>
+                        </outputColumn>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of Call count]" dataType="i4" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of Call count]" name="Copy of Call count" truncationRowDisposition="FailComponent">
+                          <properties>
+                            <property containsID="true" dataType="System.Int32" description="Specifies the input column used as the source of data for the conversion." name="SourceInputColumnLineageID">#{Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].Columns[Call count]}</property>
+                            <property dataType="System.Boolean" description="Indicates whether the column uses the faster, locale-neutral parsing routines." name="FastParse">false</property>
+                          </properties>
+                        </outputColumn>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of % of calls]" dataType="numeric" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of % of calls]" name="Copy of % of calls" precision="10" scale="2" truncationRowDisposition="FailComponent">
+                          <properties>
+                            <property containsID="true" dataType="System.Int32" description="Specifies the input column used as the source of data for the conversion." name="SourceInputColumnLineageID">#{Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].Columns[% of calls]}</property>
+                            <property dataType="System.Boolean" description="Indicates whether the column uses the faster, locale-neutral parsing routines." name="FastParse">false</property>
+                          </properties>
+                        </outputColumn>
+                      </outputColumns>
+                      <externalMetadataColumns/>
+                    </output>
+                    <output refId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Error Output]" exclusionGroup="1" isErrorOut="true" name="Data Conversion Error Output" synchronousInputId="Package\Sequence Container\Data Flow Task\Data Conversion.Inputs[Data Conversion Input]">
+                      <outputColumns>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Error Output].Columns[ErrorCode]" dataType="i4" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Error Output].Columns[ErrorCode]" name="ErrorCode" specialFlags="1"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Error Output].Columns[ErrorColumn]" dataType="i4" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Error Output].Columns[ErrorColumn]" name="ErrorColumn" specialFlags="2"/>
+                      </outputColumns>
+                      <externalMetadataColumns/>
+                    </output>
+                  </outputs>
+                </component>
+                <component refId="Package\Sequence Container\Data Flow Task\Data Conversion 1" componentClassID="Microsoft.DataConvert" contactInfo="Data Conversion;Microsoft Corporation;Microsoft SqlServer v9; (C) 2005 Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0" description="Data Conversion" name="Data Conversion 1" usesDispositions="true">
+                  <inputs>
+                    <input refId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Inputs[Data Conversion Input]" name="Data Conversion Input">
+                      <inputColumns>
+                        <inputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Inputs[Data Conversion Input].Columns[Call reason]" cachedCodepage="1252" cachedDataType="str" cachedLength="255" cachedName="Call reason" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].Columns[Call reason]"/>
+                        <inputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Inputs[Data Conversion Input].Columns[Call count]" cachedDataType="i4" cachedName="Call count" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].Columns[Call count]"/>
+                        <inputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Inputs[Data Conversion Input].Columns[% of calls]" cachedDataType="numeric" cachedName="% of calls" cachedPrecision="10" cachedScale="2" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].Columns[% of calls]"/>
+                      </inputColumns>
+                      <externalMetadataColumns/>
+                    </input>
+                  </inputs>
+                  <outputs>
+                    <output refId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Output]" exclusionGroup="1" name="Data Conversion Output" synchronousInputId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Inputs[Data Conversion Input]">
+                      <outputColumns>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Output].Columns[Copy of Call reason]" dataType="wstr" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" length="255" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Output].Columns[Copy of Call reason]" name="Copy of Call reason" truncationRowDisposition="FailComponent">
+                          <properties>
+                            <property containsID="true" dataType="System.Int32" description="Specifies the input column used as the source of data for the conversion." name="SourceInputColumnLineageID">#{Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].Columns[Call reason]}</property>
+                            <property dataType="System.Boolean" description="Indicates whether the column uses the faster, locale-neutral parsing routines." name="FastParse">false</property>
+                          </properties>
+                        </outputColumn>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Output].Columns[Copy of Call count]" dataType="i4" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Output].Columns[Copy of Call count]" name="Copy of Call count" truncationRowDisposition="FailComponent">
+                          <properties>
+                            <property containsID="true" dataType="System.Int32" description="Specifies the input column used as the source of data for the conversion." name="SourceInputColumnLineageID">#{Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].Columns[Call count]}</property>
+                            <property dataType="System.Boolean" description="Indicates whether the column uses the faster, locale-neutral parsing routines." name="FastParse">false</property>
+                          </properties>
+                        </outputColumn>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Output].Columns[Copy of % of calls]" dataType="numeric" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Output].Columns[Copy of % of calls]" name="Copy of % of calls" precision="10" scale="2" truncationRowDisposition="FailComponent">
+                          <properties>
+                            <property containsID="true" dataType="System.Int32" description="Specifies the input column used as the source of data for the conversion." name="SourceInputColumnLineageID">#{Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].Columns[% of calls]}</property>
+                            <property dataType="System.Boolean" description="Indicates whether the column uses the faster, locale-neutral parsing routines." name="FastParse">false</property>
+                          </properties>
+                        </outputColumn>
+                      </outputColumns>
+                      <externalMetadataColumns/>
+                    </output>
+                    <output refId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Error Output]" exclusionGroup="1" isErrorOut="true" name="Data Conversion Error Output" synchronousInputId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Inputs[Data Conversion Input]">
+                      <outputColumns>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Error Output].Columns[ErrorCode]" dataType="i4" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Error Output].Columns[ErrorCode]" name="ErrorCode" specialFlags="1"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Error Output].Columns[ErrorColumn]" dataType="i4" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Error Output].Columns[ErrorColumn]" name="ErrorColumn" specialFlags="2"/>
+                      </outputColumns>
+                      <externalMetadataColumns/>
+                    </output>
+                  </outputs>
+                </component>
+                <component refId="Package\Sequence Container\Data Flow Task\Excel Destination" componentClassID="Microsoft.ExcelDestination" contactInfo="Excel Destination;Microsoft Corporation;Microsoft SqlServer v9; (C) 2005 Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0" description="Excel Destination" name="Excel Destination" usesDispositions="true">
+                  <properties>
+                    <property dataType="System.Int32" description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out." name="CommandTimeout">0</property>
+                    <property dataType="System.String" description="Specifies the name of the database object used to open a rowset." name="OpenRowset">Monthly$</property>
+                    <property dataType="System.String" description="Specifies the variable that contains the name of the database object used to open a rowset." name="OpenRowsetVariable"></property>
+                    <property dataType="System.String" description="The SQL command to be executed." name="SqlCommand" UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                    <property dataType="System.Int32" description="Specifies the mode used to access the database." name="AccessMode" typeConverter="AccessMode">0</property>
+                    <property dataType="System.Boolean" description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on." name="FastLoadKeepIdentity">false</property>
+                    <property dataType="System.Boolean" description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destinaton. Applies only if fast load is turned on." name="FastLoadKeepNulls">false</property>
+                    <property dataType="System.String" description="Specifies options to be used with fast load.  Applies only if fast load is turned on." name="FastLoadOptions"></property>
+                    <property dataType="System.Int32" description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on." name="FastLoadMaxInsertCommitSize">0</property>
+                  </properties>
+                  <connections>
+                    <connection refId="Package\Sequence Container\Data Flow Task\Excel Destination.Connections[OleDbConnection]" connectionManagerID="Package.ConnectionManagers[Excel Connection Manager]" connectionManagerRefId="Package.ConnectionManagers[Excel Connection Manager]" description="The OLE DB runtime connection used to access the database." name="OleDbConnection"/>
+                  </connections>
+                  <inputs>
+                    <input refId="Package\Sequence Container\Data Flow Task\Excel Destination.Inputs[Excel Destination Input]" errorOrTruncationOperation="Insert" errorRowDisposition="FailComponent" hasSideEffects="true" name="Excel Destination Input">
+                      <inputColumns>
+                        <inputColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination.Inputs[Excel Destination Input].Columns[Copy of Call reason]" cachedDataType="wstr" cachedLength="255" cachedName="Copy of Call reason" externalMetadataColumnId="Package\Sequence Container\Data Flow Task\Excel Destination.Inputs[Excel Destination Input].ExternalColumns[Call Reason]" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of Call reason]"/>
+                        <inputColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination.Inputs[Excel Destination Input].Columns[Copy of Call count]" cachedDataType="i4" cachedName="Copy of Call count" externalMetadataColumnId="Package\Sequence Container\Data Flow Task\Excel Destination.Inputs[Excel Destination Input].ExternalColumns[Call count]" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of Call count]"/>
+                        <inputColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination.Inputs[Excel Destination Input].Columns[Copy of % of calls]" cachedDataType="numeric" cachedName="Copy of % of calls" cachedPrecision="10" cachedScale="2" externalMetadataColumnId="Package\Sequence Container\Data Flow Task\Excel Destination.Inputs[Excel Destination Input].ExternalColumns[% of calls]" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Output].Columns[Copy of % of calls]"/>
+                      </inputColumns>
+                      <externalMetadataColumns isUsed="True">
+                        <externalMetadataColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination.Inputs[Excel Destination Input].ExternalColumns[Call Reason]" dataType="wstr" length="255" name="Call Reason"/>
+                        <externalMetadataColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination.Inputs[Excel Destination Input].ExternalColumns[Call count]" dataType="wstr" length="255" name="Call count"/>
+                        <externalMetadataColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination.Inputs[Excel Destination Input].ExternalColumns[% of calls]" dataType="wstr" length="255" name="% of calls"/>
+                      </externalMetadataColumns>
+                    </input>
+                  </inputs>
+                  <outputs>
+                    <output refId="Package\Sequence Container\Data Flow Task\Excel Destination.Outputs[Excel Destination Error Output]" exclusionGroup="1" isErrorOut="true" name="Excel Destination Error Output" synchronousInputId="Package\Sequence Container\Data Flow Task\Excel Destination.Inputs[Excel Destination Input]">
+                      <outputColumns>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination.Outputs[Excel Destination Error Output].Columns[ErrorCode]" dataType="i4" lineageId="Package\Sequence Container\Data Flow Task\Excel Destination.Outputs[Excel Destination Error Output].Columns[ErrorCode]" name="ErrorCode" specialFlags="1"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination.Outputs[Excel Destination Error Output].Columns[ErrorColumn]" dataType="i4" lineageId="Package\Sequence Container\Data Flow Task\Excel Destination.Outputs[Excel Destination Error Output].Columns[ErrorColumn]" name="ErrorColumn" specialFlags="2"/>
+                      </outputColumns>
+                      <externalMetadataColumns/>
+                    </output>
+                  </outputs>
+                </component>
+                <component refId="Package\Sequence Container\Data Flow Task\Excel Destination 1" componentClassID="Microsoft.ExcelDestination" contactInfo="Excel Destination;Microsoft Corporation;Microsoft SqlServer v9; (C) 2005 Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0" description="Excel Destination" name="Excel Destination 1" usesDispositions="true">
+                  <properties>
+                    <property dataType="System.Int32" description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out." name="CommandTimeout">0</property>
+                    <property dataType="System.String" description="Specifies the name of the database object used to open a rowset." name="OpenRowset">'Year to Date$'</property>
+                    <property dataType="System.String" description="Specifies the variable that contains the name of the database object used to open a rowset." name="OpenRowsetVariable"></property>
+                    <property dataType="System.String" description="The SQL command to be executed." name="SqlCommand" UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                    <property dataType="System.Int32" description="Specifies the mode used to access the database." name="AccessMode" typeConverter="AccessMode">0</property>
+                    <property dataType="System.Boolean" description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on." name="FastLoadKeepIdentity">false</property>
+                    <property dataType="System.Boolean" description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destinaton. Applies only if fast load is turned on." name="FastLoadKeepNulls">false</property>
+                    <property dataType="System.String" description="Specifies options to be used with fast load.  Applies only if fast load is turned on." name="FastLoadOptions"></property>
+                    <property dataType="System.Int32" description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on." name="FastLoadMaxInsertCommitSize">0</property>
+                  </properties>
+                  <connections>
+                    <connection refId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Connections[OleDbConnection]" connectionManagerID="Package.ConnectionManagers[Excel Connection Manager]" connectionManagerRefId="Package.ConnectionManagers[Excel Connection Manager]" description="The OLE DB runtime connection used to access the database." name="OleDbConnection"/>
+                  </connections>
+                  <inputs>
+                    <input refId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Inputs[Excel Destination Input]" errorOrTruncationOperation="Insert" errorRowDisposition="FailComponent" hasSideEffects="true" name="Excel Destination Input">
+                      <inputColumns>
+                        <inputColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Inputs[Excel Destination Input].Columns[Copy of Call reason]" cachedDataType="wstr" cachedLength="255" cachedName="Copy of Call reason" externalMetadataColumnId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Inputs[Excel Destination Input].ExternalColumns[Call Reason]" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Output].Columns[Copy of Call reason]"/>
+                        <inputColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Inputs[Excel Destination Input].Columns[Copy of Call count]" cachedDataType="i4" cachedName="Copy of Call count" externalMetadataColumnId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Inputs[Excel Destination Input].ExternalColumns[Call count]" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Output].Columns[Copy of Call count]"/>
+                        <inputColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Inputs[Excel Destination Input].Columns[Copy of % of calls]" cachedDataType="numeric" cachedName="Copy of % of calls" cachedPrecision="10" cachedScale="2" externalMetadataColumnId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Inputs[Excel Destination Input].ExternalColumns[% of calls]" lineageId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Output].Columns[Copy of % of calls]"/>
+                      </inputColumns>
+                      <externalMetadataColumns isUsed="True">
+                        <externalMetadataColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Inputs[Excel Destination Input].ExternalColumns[Call Reason]" dataType="wstr" length="255" name="Call Reason"/>
+                        <externalMetadataColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Inputs[Excel Destination Input].ExternalColumns[Call count]" dataType="wstr" length="255" name="Call count"/>
+                        <externalMetadataColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Inputs[Excel Destination Input].ExternalColumns[% of calls]" dataType="wstr" length="255" name="% of calls"/>
+                      </externalMetadataColumns>
+                    </input>
+                  </inputs>
+                  <outputs>
+                    <output refId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Outputs[Excel Destination Error Output]" exclusionGroup="1" isErrorOut="true" name="Excel Destination Error Output" synchronousInputId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Inputs[Excel Destination Input]">
+                      <outputColumns>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Outputs[Excel Destination Error Output].Columns[ErrorCode]" dataType="i4" lineageId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Outputs[Excel Destination Error Output].Columns[ErrorCode]" name="ErrorCode" specialFlags="1"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Outputs[Excel Destination Error Output].Columns[ErrorColumn]" dataType="i4" lineageId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Outputs[Excel Destination Error Output].Columns[ErrorColumn]" name="ErrorColumn" specialFlags="2"/>
+                      </outputColumns>
+                      <externalMetadataColumns/>
+                    </output>
+                  </outputs>
+                </component>
+                <component refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly" componentClassID="Microsoft.OLEDBSource" contactInfo="OLE DB Source;Microsoft Corporation;Microsoft SqlServer v9; (C) 2005 Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7" description="OLE DB Source" name="OLE DB Source Monthly" usesDispositions="true" version="7">
+                  <properties>
+                    <property dataType="System.Int32" description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out." name="CommandTimeout">0</property>
+                    <property dataType="System.String" description="Specifies the name of the database object used to open a rowset." name="OpenRowset"></property>
+                    <property dataType="System.String" description="Specifies the variable that contains the name of the database object used to open a rowset." name="OpenRowsetVariable"></property>
+                    <property dataType="System.String" description="The SQL command to be executed." name="SqlCommand" UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">select reason as 'Call reason',
+	   reason_count as 'Call count',
+	   '% of calls' = cast(cast(reason_count as decimal)/cast(Total_calls as decimal) * 100 as decimal (10,2)) 
+from adhoc.dbo.NI0001SOTHIspcallsfin
+order by reason_count desc</property>
+                    <property dataType="System.String" description="The variable that contains the SQL command to be executed." name="SqlCommandVariable"></property>
+                    <property dataType="System.Int32" description="Specifies the column code page to use when code page information is unavailable from the data source." name="DefaultCodePage">1252</property>
+                    <property dataType="System.Boolean" description="Forces the use of the DefaultCodePage property value when describing character data." name="AlwaysUseDefaultCodePage">false</property>
+                    <property dataType="System.Int32" description="Specifies the mode used to access the database." name="AccessMode" typeConverter="AccessMode">2</property>
+                    <property dataType="System.String" description="The mappings between the parameters in the SQL command and variables." name="ParameterMapping"></property>
+                  </properties>
+                  <connections>
+                    <connection refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Connections[OleDbConnection]" connectionManagerID="Package.ConnectionManagers[nile-r1.adhoc]" connectionManagerRefId="Package.ConnectionManagers[nile-r1.adhoc]" description="The OLE DB runtime connection used to access the database." name="OleDbConnection"/>
+                  </connections>
+                  <outputs>
+                    <output refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output]" name="OLE DB Source Output">
+                      <outputColumns>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].Columns[Call reason]" codePage="1252" dataType="str" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" externalMetadataColumnId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].ExternalColumns[Call reason]" length="255" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].Columns[Call reason]" name="Call reason" truncationRowDisposition="FailComponent"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].Columns[Call count]" dataType="i4" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" externalMetadataColumnId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].ExternalColumns[Call count]" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].Columns[Call count]" name="Call count" truncationRowDisposition="FailComponent"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].Columns[% of calls]" dataType="numeric" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" externalMetadataColumnId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].ExternalColumns[% of calls]" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].Columns[% of calls]" name="% of calls" precision="10" scale="2" truncationRowDisposition="FailComponent"/>
+                      </outputColumns>
+                      <externalMetadataColumns isUsed="True">
+                        <externalMetadataColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].ExternalColumns[Call reason]" codePage="1252" dataType="str" length="255" name="Call reason"/>
+                        <externalMetadataColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].ExternalColumns[Call count]" dataType="i4" name="Call count"/>
+                        <externalMetadataColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output].ExternalColumns[% of calls]" dataType="numeric" name="% of calls" precision="10" scale="2"/>
+                      </externalMetadataColumns>
+                    </output>
+                    <output refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Error Output]" isErrorOut="true" name="OLE DB Source Error Output">
+                      <outputColumns>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Error Output].Columns[Call reason]" codePage="1252" dataType="str" length="255" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Error Output].Columns[Call reason]" name="Call reason"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Error Output].Columns[Call count]" dataType="i4" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Error Output].Columns[Call count]" name="Call count"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Error Output].Columns[% of calls]" dataType="numeric" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Error Output].Columns[% of calls]" name="% of calls" precision="10" scale="2"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Error Output].Columns[ErrorCode]" dataType="i4" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Error Output].Columns[ErrorCode]" name="ErrorCode" specialFlags="1"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]" dataType="i4" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]" name="ErrorColumn" specialFlags="2"/>
+                      </outputColumns>
+                      <externalMetadataColumns/>
+                    </output>
+                  </outputs>
+                </component>
+                <component refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD" componentClassID="Microsoft.OLEDBSource" contactInfo="OLE DB Source;Microsoft Corporation;Microsoft SqlServer v9; (C) 2005 Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7" description="OLE DB Source" name="OLE DB Source YTD" usesDispositions="true" version="7">
+                  <properties>
+                    <property dataType="System.Int32" description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out." name="CommandTimeout">0</property>
+                    <property dataType="System.String" description="Specifies the name of the database object used to open a rowset." name="OpenRowset"></property>
+                    <property dataType="System.String" description="Specifies the variable that contains the name of the database object used to open a rowset." name="OpenRowsetVariable"></property>
+                    <property dataType="System.String" description="The SQL command to be executed." name="SqlCommand" UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">select reason as 'Call reason',
+	   reason_count as 'Call count',
+	   '% of calls' = cast(cast(reason_count as decimal)/cast(Total_calls as decimal) * 100 as decimal (10,2)) 
+from adhoc.dbo.NI0001SOTHIspcallsfinYTD
+order by reason_count desc</property>
+                    <property dataType="System.String" description="The variable that contains the SQL command to be executed." name="SqlCommandVariable"></property>
+                    <property dataType="System.Int32" description="Specifies the column code page to use when code page information is unavailable from the data source." name="DefaultCodePage">1252</property>
+                    <property dataType="System.Boolean" description="Forces the use of the DefaultCodePage property value when describing character data." name="AlwaysUseDefaultCodePage">false</property>
+                    <property dataType="System.Int32" description="Specifies the mode used to access the database." name="AccessMode" typeConverter="AccessMode">2</property>
+                    <property dataType="System.String" description="The mappings between the parameters in the SQL command and variables." name="ParameterMapping"></property>
+                  </properties>
+                  <connections>
+                    <connection refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Connections[OleDbConnection]" connectionManagerID="Package.ConnectionManagers[nile-r1.adhoc]" connectionManagerRefId="Package.ConnectionManagers[nile-r1.adhoc]" description="The OLE DB runtime connection used to access the database." name="OleDbConnection"/>
+                  </connections>
+                  <outputs>
+                    <output refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output]" name="OLE DB Source Output">
+                      <outputColumns>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].Columns[Call reason]" codePage="1252" dataType="str" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" externalMetadataColumnId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].ExternalColumns[Call reason]" length="255" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].Columns[Call reason]" name="Call reason" truncationRowDisposition="FailComponent"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].Columns[Call count]" dataType="i4" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" externalMetadataColumnId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].ExternalColumns[Call count]" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].Columns[Call count]" name="Call count" truncationRowDisposition="FailComponent"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].Columns[% of calls]" dataType="numeric" errorOrTruncationOperation="Conversion" errorRowDisposition="FailComponent" externalMetadataColumnId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].ExternalColumns[% of calls]" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].Columns[% of calls]" name="% of calls" precision="10" scale="2" truncationRowDisposition="FailComponent"/>
+                      </outputColumns>
+                      <externalMetadataColumns isUsed="True">
+                        <externalMetadataColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].ExternalColumns[Call reason]" codePage="1252" dataType="str" length="255" name="Call reason"/>
+                        <externalMetadataColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].ExternalColumns[Call count]" dataType="i4" name="Call count"/>
+                        <externalMetadataColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output].ExternalColumns[% of calls]" dataType="numeric" name="% of calls" precision="10" scale="2"/>
+                      </externalMetadataColumns>
+                    </output>
+                    <output refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Error Output]" isErrorOut="true" name="OLE DB Source Error Output">
+                      <outputColumns>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Error Output].Columns[Call reason]" codePage="1252" dataType="str" length="255" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Error Output].Columns[Call reason]" name="Call reason"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Error Output].Columns[Call count]" dataType="i4" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Error Output].Columns[Call count]" name="Call count"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Error Output].Columns[% of calls]" dataType="numeric" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Error Output].Columns[% of calls]" name="% of calls" precision="10" scale="2"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Error Output].Columns[ErrorCode]" dataType="i4" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Error Output].Columns[ErrorCode]" name="ErrorCode" specialFlags="1"/>
+                        <outputColumn refId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]" dataType="i4" lineageId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]" name="ErrorColumn" specialFlags="2"/>
+                      </outputColumns>
+                      <externalMetadataColumns/>
+                    </output>
+                  </outputs>
+                </component>
+              </components>
+              <paths>
+                <path refId="Package\Sequence Container\Data Flow Task.Paths[Data Conversion Output1]" endId="Package\Sequence Container\Data Flow Task\Excel Destination.Inputs[Excel Destination Input]" name="Data Conversion Output" startId="Package\Sequence Container\Data Flow Task\Data Conversion.Outputs[Data Conversion Output]"/>
+                <path refId="Package\Sequence Container\Data Flow Task.Paths[Data Conversion Output]" endId="Package\Sequence Container\Data Flow Task\Excel Destination 1.Inputs[Excel Destination Input]" name="Data Conversion Output" startId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Outputs[Data Conversion Output]"/>
+                <path refId="Package\Sequence Container\Data Flow Task.Paths[OLE DB Source Output1]" endId="Package\Sequence Container\Data Flow Task\Data Conversion.Inputs[Data Conversion Input]" name="OLE DB Source Output" startId="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly.Outputs[OLE DB Source Output]"/>
+                <path refId="Package\Sequence Container\Data Flow Task.Paths[OLE DB Source Output]" endId="Package\Sequence Container\Data Flow Task\Data Conversion 1.Inputs[Data Conversion Input]" name="OLE DB Source Output" startId="Package\Sequence Container\Data Flow Task\OLE DB Source YTD.Outputs[OLE DB Source Output]"/>
+              </paths>
+            </pipeline>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable DTS:refId="Package\Sequence Container\Execute SQL Main Q" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:DelayValidation="True" DTS:Description="Execute SQL Task" DTS:DTSID="{F15465D1-E229-4006-A409-FAEDEB5BFAB0}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="Execute SQL Main Q" DTS:TaskContact="Execute SQL Task; Microsoft Corporation; Microsoft SQL Server v9; © 2004 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1" DTS:ThreadHint="0">
+          <DTS:Variables/>
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData SQLTask:Connection="{B6DF6CBA-4A05-4DEB-80BF-E775668963CD}" SQLTask:SqlStatementSource="--run on Nile-r1&#xA;use CenteneKS&#xA;&#xA;IF OBJECT_ID('adhoc.dbo.NI0001SOTHIspcall', 'U') IS NOT NULL  DROP TABLE adhoc.dbo.NI0001SOTHIspcall&#xA;IF OBJECT_ID('adhoc.dbo.NI0001SOTHIspcalls', 'U') IS NOT NULL  DROP TABLE adhoc.dbo.NI0001SOTHIspcalls&#xA;IF OBJECT_ID('adhoc.dbo.NI0001SOTHIspcalls2', 'U') IS NOT NULL  DROP TABLE adhoc.dbo.NI0001SOTHIspcalls2&#xA;IF OBJECT_ID('adhoc.dbo.NI0001SOTHIspcallstot', 'U') IS NOT NULL  DROP TABLE adhoc.dbo.NI0001SOTHIspcallstot&#xA;IF OBJECT_ID('adhoc.dbo.NI0001SOTHIspcallsfin', 'U') IS NOT NULL  DROP TABLE adhoc.dbo.NI0001SOTHIspcallsfin&#xA;&#xA;IF OBJECT_ID('adhoc.dbo.NI0001SOTHIspcalls2YTD', 'U') IS NOT NULL  DROP TABLE adhoc.dbo.NI0001SOTHIspcalls2YTD&#xA;IF OBJECT_ID('adhoc.dbo.NI0001SOTHIspcallstotYTD', 'U') IS NOT NULL  DROP TABLE adhoc.dbo.NI0001SOTHIspcallstotYTD&#xA;IF OBJECT_ID('adhoc.dbo.NI0001SOTHIspcallsfinYTD', 'U') IS NOT NULL  DROP TABLE adhoc.dbo.NI0001SOTHIspcallsfinYTD&#xA;&#xA;declare @start_date datetime&#xA;declare @start_date_YTD datetime&#xA;declare	@end_date datetime&#xA;      	   &#xA;SET @start_date =	DATEADD(MM,-1,DATEADD(MM,DATEDIFF(MM,0, GetDate()),0)) -- First day of prior Month&#xA;SET @start_date_YTD = case &#xA;		when datepart(m,getdate()) = 1 -- January&#xA;		       then DATEADD(year,-1,DATEADD(Year,DATEDIFF(year,0, GetDate()),0)) -- go back to Jan of previous year&#xA;			   else  DATEADD(year,0,DATEADD(Year,DATEDIFF(year,0, GetDate()),0))  --Jan of current year&#xA;        end &#xA;SET	@end_date	=	DATEADD(ms,-3,DATEADD(mm,DATEDIFF(mm,0, GetDate()),0)) -- Last day of Last Month &#xA;&#xA;select  &#xA;		'CenteneKS' as 'car_name',&#xA;		u.location_name as 'location',&#xA;		u.lname as 'lastname',&#xA;		u.fname as 'firstname',&#xA;		a.date_call_rcvd as 'callreceiveddate',&#xA;		a.call_tracking_contact_type_id as 'contacttypeid',&#xA;		a.call_tracking_call_type_id as 'calltypeid',&#xA;		a.call_tracking_call_reason_id as 'reasonid',&#xA;		a.call_tracking_resolution_id as 'resolutionid',&#xA;		a.member_id as 'memberid',&#xA;		a.call_tracking_call_id as 'callid'&#xA;		&#xA;into adhoc.dbo.NI0001SOTHIspcall&#xA;&#xA;from niacore..is_users u	     &#xA;	join call_tracking_calls a on (a.user_name = u.log_id)	     &#xA;	join members m on (a.member_id = m.member_id)&#xA;	join niacore..health_plan hp on (m.plan_id = hp.plan_id ) and hp.line_of_business = 'MD'&#xA;&#xA;WHERE	a.date_call_rcvd &gt;=  convert(varchar(10), @start_date_YTD, 101) &#xA;	  and a.date_call_rcvd &lt; convert(varchar(10),  dateadd(dd, 1, @end_date), 101) &#xA;----------&#xA;&#xA;select c.car_name as 'customer',&#xA;       isnull(c.location,'-N/A-') as 'location',&#xA;       c.lastname+', '+c.firstname as 'username',&#xA;       c.callreceiveddate,&#xA;       t.call_tracking_contact_type_desc as 'contacttype',&#xA;       u.call_tracking_call_type_desc as 'calltype',&#xA;       r.call_tracking_call_reason_desc as 'reason',&#xA;       s.call_tracking_resolution as 'resolution',&#xA;       isnull(c.memberid,' ') as 'memberid',&#xA;       callid&#xA;into adhoc.dbo.NI0001SOTHIspcalls &#xA;from adhoc.dbo.NI0001SOTHIspcall c&#xA;     left outer join niacore..call_tracking_call_reasons r on (c.reasonid = r.call_tracking_call_reason_id)&#xA;     left outer join niacore..call_tracking_resolutions s  on (c.resolutionid = s.call_tracking_resolution_id)&#xA;     left outer join niacore..call_tracking_contact_types t on (c.contacttypeid = t.call_tracking_contact_type_id)&#xA;     left outer join niacore..call_tracking_call_types u on (c.calltypeid = u.call_tracking_call_type_id)&#xA;&#xA;select COUNT(callid) as total_calls, &#xA;	  key_1 = 1	  &#xA;into  adhoc.dbo.NI0001SOTHIspcallstot&#xA;From adhoc.dbo.NI0001SOTHIspcalls t&#xA;WHERE &#xA;		callreceiveddate &gt;= @start_date&#xA;	and callreceiveddate &lt; convert(varchar(10),  dateadd(dd, 1, @end_date), 101)&#xA;&#xA;--get top 5 reasons MONTH&#xA;select top 5&#xA;		sp.reason,&#xA;		count (sp.reason) as reason_count,&#xA;		key_1 = 1&#xA;into adhoc.dbo.NI0001SOTHIspcalls2&#xA;from adhoc.dbo.NI0001SOTHIspcalls sp&#xA;WHERE &#xA;		callreceiveddate &gt;= @start_date&#xA;		and callreceiveddate &lt; convert(varchar(10),  dateadd(dd, 1, @end_date), 101)&#xA;group by sp.reason&#xA;order by reason_count desc&#xA;&#xA;select COUNT(callid) as total_calls, &#xA;	  key_1 = 1	  &#xA;into adhoc.dbo.NI0001SOTHIspcallstotYTD&#xA;From adhoc.dbo.NI0001SOTHIspcalls t&#xA;WHERE &#xA;		callreceiveddate &gt;= @start_date_YTD&#xA;	and callreceiveddate &lt; convert(varchar(10),  dateadd(dd, 1, @end_date), 101)&#xA;&#xA;&#xA;--join top 5 to total calls MONTH&#xA;select t.*,t2.total_calls  &#xA;into adhoc.dbo.NI0001SOTHIspcallsfin&#xA;from adhoc.dbo.NI0001SOTHIspcalls2 t&#xA;join adhoc.dbo.NI0001SOTHIspcallstot t2 on (t.key_1 = t2.key_1)&#xA;&#xA;--calculate percentage MONTH&#xA;select reason as 'Call reason',&#xA;	   reason_count as 'Call count',&#xA;	   '% of calls' = cast(cast(reason_count as decimal)/cast(Total_calls as decimal) * 100 as decimal (10,2)) &#xA;from adhoc.dbo.NI0001SOTHIspcallsfin&#xA;order by reason_count desc&#xA;&#xA;--get top 5 reasons YTD&#xA;select top 5&#xA;		sp.reason,&#xA;		count (sp.reason) as reason_count,&#xA;		key_1 = 1&#xA;into adhoc.dbo.NI0001SOTHIspcalls2YTD&#xA;from adhoc.dbo.NI0001SOTHIspcalls sp&#xA;WHERE &#xA;		callreceiveddate &gt;= @start_date_YTD&#xA;		and callreceiveddate &lt; convert(varchar(10),  dateadd(dd, 1, @end_date), 101)&#xA;group by sp.reason&#xA;order by reason_count desc&#xA;&#xA;&#xA;select t.*,t2.total_calls  &#xA;into adhoc.dbo.NI0001SOTHIspcallsfinYTD&#xA;from adhoc.dbo.NI0001SOTHIspcalls2YTD t&#xA;join adhoc.dbo.NI0001SOTHIspcallstotYTD t2 on (t.key_1 = t2.key_1)&#xA;&#xA;--calculate percentage YTD&#xA;select reason as 'Call reason',&#xA;	   reason_count as 'Call count',&#xA;	   '% of calls' = cast(cast(reason_count as decimal)/cast(Total_calls as decimal) * 100 as decimal (10,2)) &#xA;from adhoc.dbo.NI0001SOTHIspcallsfinYTD&#xA;order by reason_count desc" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"/>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable DTS:refId="Package\Sequence Container\File System Task" DTS:CreationName="Microsoft.FileSystemTask" DTS:DelayValidation="True" DTS:Description="File System Task" DTS:DTSID="{F59AF8E5-2A32-4B7B-ACAA-9B5924552691}" DTS:ExecutableType="Microsoft.FileSystemTask" DTS:LocaleID="-1" DTS:ObjectName="File System Task" DTS:TaskContact="File System Task;Microsoft Corporation; Microsoft SQL Server v9; © 2004 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1" DTS:ThreadHint="0">
+          <DTS:Variables/>
+          <DTS:ObjectData>
+            <FileSystemData TaskOverwriteDestFile="True" TaskSourcePath="User::Template" TaskIsSourceVariable="True" TaskDestinationPath="User::SaveFileFullName" TaskIsDestinationVariable="True"/>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable DTS:refId="Package\Sequence Container\Script Task" DTS:CreationName="Microsoft.ScriptTask" DTS:DelayValidation="True" DTS:Description="Script Task" DTS:DTSID="{E9F59D3A-EADC-45C9-A66B-590294888245}" DTS:ExecutableType="Microsoft.ScriptTask" DTS:LocaleID="-1" DTS:ObjectName="Script Task" DTS:ThreadHint="0">
+          <DTS:Variables/>
+          <DTS:ObjectData>
+            <ScriptProject Name="ScriptTask_d3361d016fb04d02b1292443688dabb2" VSTAMajorVersion="3" VSTAMinorVersion="0" Language="VisualBasic" ReadOnlyVariables="SaveFile" ReadWriteVariables="SaveFileFullName">
+              <ProjectItem Name="ScriptMain.vb" Encoding="UTF8"><![CDATA[' Microsoft SQL Server Integration Services Script Task
+' Write scripts using Microsoft Visual Basic
+' The ScriptMain class is the entry point of the Script Task.
+
+Imports System
+Imports System.Data
+Imports System.Math
+Imports Microsoft.SqlServer.Dts.Runtime
+Imports Microsoft.VisualBasic.DateAndTime
+
+<Microsoft.SqlServer.Dts.Tasks.ScriptTask.SSISScriptTaskEntryPointAttribute> _
+<System.CLSCompliantAttribute(False)> _
+Partial Public Class ScriptMain
+	Inherits Microsoft.SqlServer.Dts.Tasks.ScriptTask.VSTARTScriptObjectModelBase
+
+	Enum ScriptResults
+		Success = Microsoft.SqlServer.Dts.Runtime.DTSExecResult.Success
+		Failure = Microsoft.SqlServer.Dts.Runtime.DTSExecResult.Failure
+	End Enum
+
+	' The execution engine calls this method when the task executes.
+	' To access the object model, use the Dts object. Connections, variables, events,
+	' and logging features are available as static members of the Dts class.
+	' Before returning from this method, set the value of Dts.TaskResult to indicate success or failure.
+	' 
+	' To open Code and Text Editor Help, press F1.
+	' To open Object Browser, press Ctrl+Alt+J.
+
+	Public Sub Main()
+		'
+        'Dts.Variables("SaveFileFullName").Value = CStr(Dts.Variables("SaveFile").Value) + "NI0001SOTHI Centene KS Call Stats_" + CStr(MonthName(Month(Now()) + 11)) + ".XLS"
+        If Month(Now()) = 1 Then
+            Dts.Variables("SaveFileFullName").Value = CStr(Dts.Variables("SaveFile").Value) + "NI0001SOTHI Centene KS Call Stats_" + CStr(MonthName(12)) + ".xls"
+        Else
+            Dts.Variables("SaveFileFullName").Value = CStr(Dts.Variables("SaveFile").Value) + "NI0001SOTHI Centene KS Call Stats_" + CStr(MonthName(Month(Now()) - 1)) + ".xls"
+        End If
+
+        '
+		Dts.TaskResult = ScriptResults.Success
+	End Sub
+
+End Class]]></ProjectItem>
+              <ProjectItem Name="ScriptTask_d3361d016fb04d02b1292443688dabb2.vbproj" Encoding="UTF16LE"><![CDATA[<?xml version="1.0" encoding="utf-16"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectTypeGuids>{30D016F9-3734-4E33-A861-5E7D899E18F3};{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</ProjectTypeGuids>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{f95d8c55-ae30-4ef3-aafc-e062c690953d}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>My Project</AppDesignerFolder>
+    <RootNamespace>ScriptTask_d3361d016fb04d02b1292443688dabb2</RootNamespace>
+    <AssemblyName>ScriptTask_d3361d016fb04d02b1292443688dabb2</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionStrict>On</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>.\bin\Debug\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath>.\bin\Release\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.SqlServer.ManagedDTS, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" />
+    <Reference Include="Microsoft.SqlServer.ScriptTask, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" />
+    <Reference Include="System">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Data">
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppDesigner Include="My Project\" />
+  </ItemGroup>
+  <!-- Include the build rules for a VB project.-->
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{30D016F9-3734-4E33-A861-5E7D899E18F3}">
+        <ProjectProperties HostName="ScriptTask" HostPackage="{B3A685AA-7EAF-4BC6-9940-57959FA5AC07}" ApplicationType="usd" Language="vb" TemplatesPath="" DebugInfoExeName="" DebugInfoCommandLine="" DebugInfoWorkingDir="" IconImageList="" />
+        <Host Name="ScriptTask" IconIndex=""></Host>
+        <ProjectClient>
+          <HostIdentifier>SSIS_ST120</HostIdentifier>
+        </ProjectClient>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <ItemGroup>
+    <Compile Include="ScriptMain.vb" />
+  </ItemGroup>
+</Project>]]></ProjectItem>
+              <ProjectItem Name="Project" Encoding="UTF16LE"><![CDATA[<?xml version="1.0" encoding="UTF-16" standalone="yes"?>
+<c:Project xmlns:c="http://schemas.microsoft.com/codeprojectml/2010/08/main" xmlns:msb="http://schemas.microsoft.com/developer/msbuild/2003" runtimeVersion="4.0" schemaVersion="1.0">
+	<msb:PropertyGroup>
+		<msb:Language>msBuild</msb:Language>
+		<msb:CodeName>ScriptTask_d3361d016fb04d02b1292443688dabb2</msb:CodeName>
+		<msb:DisplayName>ScriptTask_d3361d016fb04d02b1292443688dabb2</msb:DisplayName>
+		<msb:ProjectId>{3B3128E5-60FC-4AF2-AD38-29AFFE481B41}</msb:ProjectId>
+	</msb:PropertyGroup>
+	<msb:ItemGroup>
+		<msb:Project Include="ScriptTask_d3361d016fb04d02b1292443688dabb2.vbproj"/>
+		<msb:File Include="ScriptMain.vb"/>
+	</msb:ItemGroup>
+</c:Project>]]></ProjectItem>
+              <BinaryItem Name="ScriptTask_d3361d016fb04d02b1292443688dabb2.dll">TVqQAAMAAAAEAAAA//8AALgAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAgAAAAA4fug4AtAnNIbgBTM0hVGhpcyBwcm9ncmFtIGNhbm5vdCBiZSBydW4gaW4gRE9TIG1v
+ZGUuDQ0KJAAAAAAAAABQRQAATAEDAO59XloAAAAAAAAAAOAAAiELAQsAABQAAAAGAAAAAAAA7jMA
+AAAgAAAAQAAAAAAAEAAgAAAAAgAABAAAAAAAAAAEAAAAAAAAAACAAAAAAgAAAAAAAAIAQIUAABAA
+ABAAAAAAEAAAEAAAAAAAABAAAAAAAAAAAAAAAJgzAABTAAAAAEAAADADAAAAAAAAAAAAAAAAAAAA
+AAAAAGAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAIAAACAAAAAAAAAAAAAAACCAAAEgAAAAAAAAAAAAAAC50ZXh0AAAA9BMAAAAgAAAAFAAAAAIA
+AAAAAAAAAAAAAAAAACAAAGAucnNyYwAAADADAAAAQAAAAAQAAAAWAAAAAAAAAAAAAAAAAABAAABA
+LnJlbG9jAAAMAAAAAGAAAAACAAAAGgAAAAAAAAAAAAAAAAAAQAAAQgAAAAAAAAAAAAAAAAAAAADQ
+MwAAAAAAAEgAAAACAAUArCIAAOwQAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAB4CKAEAAAoqHgIoBAAACiqmcwYAAAqAAQAABHMHAAAKgAIA
+AARzCAAACoADAAAEcwkAAAqABAAABCoAABMwAQALAAAAAQAAEX4BAAAEbwoAAAoqABMwAQALAAAA
+AgAAEX4CAAAEbwsAAAoqABMwAQALAAAAAwAAEX4DAAAEbwwAAAoqABMwAQALAAAABAAAEX4EAAAE
+bw0AAAoqABMwAgANAAAABQAAEQIDKBEAAAooEgAACioAAAATMAEABwAAAAYAABECKBMAAAoqABMw
+AQALAAAABwAAEdAFAAACKBQAAAoqABMwAQAHAAAACAAAEQIoFQAACioAEzABABAAAAAJAAARAowB
+AAAbLQYoAQAAKyoCKhMwAgAQAAAACgAAEQMSAP4VAgAAGwaBAgAAGyoeAigXAAAKKhMwAgAoAAAA
+CwAAEQJ7GQAACm8aAAAKCweMAwAAGy0SKAIAACsLAnsZAAAKB28bAAAKBypKAigXAAAKAnMcAAAK
+fRkAAAoqAB4CKB4AAAoqEzAFAMYAAAAAAAAAKB8AAAooIAAAChczUgJvIQAACm8iAAAKcgEAAHBv
+IwAACgJvIQAACm8iAAAKciMAAHBvIwAACm8kAAAKKCUAAApyNQAAcB8MFigmAAAKcnsAAHAoJwAA
+Cm8oAAAKK1oCbyEAAApvIgAACnIBAABwbyMAAAoCbyEAAApvIgAACnIjAABwbyMAAApvJAAACigl
+AAAKcjUAAHAoHwAACiggAAAKF9oWKCYAAApyewAAcCgnAAAKbygAAAoCbyEAAAoWbykAAAoqAABC
+U0pCAQABAAAAAAAMAAAAdjQuMC4zMDMxOQAAAAAFAGwAAAAIBgAAI34AAHQGAAAQBwAAI1N0cmlu
+Z3MAAAAAhA0AAIgAAAAjVVMADA4AABAAAAAjR1VJRAAAABwOAADQAgAAI0Jsb2IAAAAAAAAAAgAA
+AVcdogkJDgAAAPolMwAWAAABAAAAIAAAAAgAAAAIAAAAEgAAAAMAAAAuAAAAAgAAACkAAAALAAAA
+AgAAAAUAAAAFAAAACQAAAAEAAAAFAAAAAwAAAAMAAAACAAAAAADgBgEAAAAAAAoAEwHpAAoARwEp
+AQYAVwFQAQoArwHpAAYALQJQAQoArwKFAg4AHAPzAgYAPQNQARIAcANaAxIAiQNaAxIAtgOeAwYA
+4APNAwoAHwT4AwoANwQTABIAbARPBAYAoQSBBAYAvwRQAQYA4wRQAQoA/AQTAAYASgUrBQoAXgUT
+AAYAagVQAQ4AgQXzAhYA2gW6BRYA8gW6BQoABAb4AwYAGgZQAQYANwZQAQ4ATQbzAgYAbwaBBAYA
+jwaBBAYAxwatBgAAAAABAAAAAAABAAEAAAAAACkANwAFAAEAAQAAAAAAZgA3AAkAAQACAAABEABx
+ADcADQABAAMABQEAAHsAAAANAAUACAAFAQAAiQAAAA0ABQAPAAEAAACkAK8AHQAGABEAAgEAANsA
+AAAhAAYAEwAxAHIBIAAxAJsBLQAxAL0BOgAxAOIBRwAhAL4CkAAGBkIDpgBWgEoDqQBWgFIDqQBQ
+IAAAAAAGGCMBEwABAFggAAAAAAYYIwETAAEAYCAAAAAAERheARcAAQCMIAAAAAATCGUBGwABAKQg
+AAAAABMIiwEoAAEAvCAAAAAAEwi0ATUAAQDUIAAAAAATCNIBQgABAOwgAAAAAEYCGAJjAAEACCEA
+AAAARgIhAmgAAgAcIQAAAACDADICbAACADQhAAAAAEYCOgJxAAIASCEAAAAAEQBDAngAAgBkIQAA
+AAABAGECgAADAIAhAAAAAAYYIwETAAQAiCEAAAAAAwh1AosABAC8IQAAAAAGGCMBEwAEANAhAAAA
+AAYYIwETAAQA2CEAAAAABgA4AxMABAAAAAEAHwIAAAEAWAIAAAEAWAIJACMBEwBJACMBtwBZACMB
+xgARACMBEwBhACMBEwAkACMBEwAsACMBEwA0ACMBEwA8ACMBEwAkAHUCiwAsAHUCiwA0AHUCiwA8
+AHUCiwBpACMBEwBxACMBEwB5ACMBFQGBALAEYAEZABgCYwAZACECaAApANEEbQEZADoCcQCRAO0E
+fQEZACMBEwCZACMBjQFEAL4CkABMABcFiwBMACEFCgJMACMBEwChACMBGQI5ACMBEwCpAHMFJAKp
+AHsFKQI5AJMFLwK5AOQFNALBAPsFOQLJABcFPwLRADoCQwKpABAGSALZACEGTgLJACEFVgK5ACgG
+WwLhACMBGQLpACMBEwDxACMBWwL5ACMBEwABASMBFQEIABwArQAIACAAsgApAIMAGgEuAHMBiAIu
+AGMBYAIuAGsBaQJAACsAsgBAABMAvQBDABsAzABDABMAvQBJAIMATAFjABsAzABjABMAvQBpAIMA
+KwGAACsAsgCDAHsAsgCDABsAzACDAHMAsgCJAIMAOAGgACsAsgCjAMMAlQGjABMAvQDAACsAsgDD
+ABMAvQDDAOsAHgLgACsAsgDjAFMBHgLjAFsBsgAAARMAvQAAASsAsgAgASsAsgAgARMAvQBAARMA
+vQBAASsAsgBgARMAvQBgASsAsgCAASsAsgCgASsAsgDAARMAvQDAASsAsgDgASsAsgAAAhMAvQAA
+AisAsgABAQYBCwEQAWUBaQF0AXkBiAGIARACBAABAAYABQAAAEcBTwAAAAACVAAAAK8BWQAAAAwC
+XgAAAMgCmAACAAQAAwACAAUABQACAAYABwACAAcACQACAA8ACwB1AHUAiADlAOwA8wD6APcB/gEE
+gAAAAAAAAAAAAAAAAAAAAACvAAAABAAAAAAAAAAAAAAAAQAKAAAAAAAKAAAAAAAAAAAAAAAKABMA
+AAAAAAwAAAAAAAAAAAAAAJ0A1AIAAAAABAAAAAAAAAAAAAAAAQBQAQAAAAAMAAAAAAAAAAAAAACd
+AJsFAAAAAAUABAAGAAQACAAHAAAAEAAMAFYCAAAQABkAVgIAAAAAGwBWAi0AgwEtAAUCAAAAAAA8
+TW9kdWxlPgBtc2NvcmxpYgBNaWNyb3NvZnQuVmlzdWFsQmFzaWMATXlBcHBsaWNhdGlvbgBTY3Jp
+cHRUYXNrX2QzMzYxZDAxNmZiMDRkMDJiMTI5MjQ0MzY4OGRhYmIyLk15AE15Q29tcHV0ZXIATXlQ
+cm9qZWN0AE15V2ViU2VydmljZXMAVGhyZWFkU2FmZU9iamVjdFByb3ZpZGVyYDEAU2NyaXB0TWFp
+bgBTY3JpcHRUYXNrX2QzMzYxZDAxNmZiMDRkMDJiMTI5MjQ0MzY4OGRhYmIyAFNjcmlwdFJlc3Vs
+dHMATWljcm9zb2Z0LlZpc3VhbEJhc2ljLkFwcGxpY2F0aW9uU2VydmljZXMAQXBwbGljYXRpb25C
+YXNlAC5jdG9yAE1pY3Jvc29mdC5WaXN1YWxCYXNpYy5EZXZpY2VzAENvbXB1dGVyAFN5c3RlbQBP
+YmplY3QALmNjdG9yAGdldF9Db21wdXRlcgBtX0NvbXB1dGVyT2JqZWN0UHJvdmlkZXIAZ2V0X0Fw
+cGxpY2F0aW9uAG1fQXBwT2JqZWN0UHJvdmlkZXIAVXNlcgBnZXRfVXNlcgBtX1VzZXJPYmplY3RQ
+cm92aWRlcgBnZXRfV2ViU2VydmljZXMAbV9NeVdlYlNlcnZpY2VzT2JqZWN0UHJvdmlkZXIAQXBw
+bGljYXRpb24AV2ViU2VydmljZXMARXF1YWxzAG8AR2V0SGFzaENvZGUAVHlwZQBHZXRUeXBlAFRv
+U3RyaW5nAENyZWF0ZV9fSW5zdGFuY2VfXwBUAGluc3RhbmNlAERpc3Bvc2VfX0luc3RhbmNlX18A
+Z2V0X0dldEluc3RhbmNlAE1pY3Jvc29mdC5WaXN1YWxCYXNpYy5NeVNlcnZpY2VzLkludGVybmFs
+AENvbnRleHRWYWx1ZWAxAG1fQ29udGV4dABHZXRJbnN0YW5jZQBNaWNyb3NvZnQuU3FsU2VydmVy
+LlNjcmlwdFRhc2sATWljcm9zb2Z0LlNxbFNlcnZlci5EdHMuVGFza3MuU2NyaXB0VGFzawBWU1RB
+UlRTY3JpcHRPYmplY3RNb2RlbEJhc2UATWFpbgBFbnVtAHZhbHVlX18AU3VjY2VzcwBGYWlsdXJl
+AFN5c3RlbS5Db21wb25lbnRNb2RlbABFZGl0b3JCcm93c2FibGVBdHRyaWJ1dGUARWRpdG9yQnJv
+d3NhYmxlU3RhdGUAU3lzdGVtLkNvZGVEb20uQ29tcGlsZXIAR2VuZXJhdGVkQ29kZUF0dHJpYnV0
+ZQBTeXN0ZW0uRGlhZ25vc3RpY3MARGVidWdnZXJIaWRkZW5BdHRyaWJ1dGUATWljcm9zb2Z0LlZp
+c3VhbEJhc2ljLkNvbXBpbGVyU2VydmljZXMAU3RhbmRhcmRNb2R1bGVBdHRyaWJ1dGUASGlkZU1v
+ZHVsZU5hbWVBdHRyaWJ1dGUAU3lzdGVtLkNvbXBvbmVudE1vZGVsLkRlc2lnbgBIZWxwS2V5d29y
+ZEF0dHJpYnV0ZQBTeXN0ZW0uUnVudGltZS5Db21waWxlclNlcnZpY2VzAFJ1bnRpbWVIZWxwZXJz
+AEdldE9iamVjdFZhbHVlAFJ1bnRpbWVUeXBlSGFuZGxlAEdldFR5cGVGcm9tSGFuZGxlAEFjdGl2
+YXRvcgBDcmVhdGVJbnN0YW5jZQBNeUdyb3VwQ29sbGVjdGlvbkF0dHJpYnV0ZQBnZXRfVmFsdWUA
+c2V0X1ZhbHVlAFN5c3RlbS5SdW50aW1lLkludGVyb3BTZXJ2aWNlcwBDb21WaXNpYmxlQXR0cmli
+dXRlAERhdGVBbmRUaW1lAERhdGVUaW1lAGdldF9Ob3cATW9udGgAU2NyaXB0T2JqZWN0TW9kZWwA
+Z2V0X0R0cwBNaWNyb3NvZnQuU3FsU2VydmVyLk1hbmFnZWREVFMATWljcm9zb2Z0LlNxbFNlcnZl
+ci5EdHMuUnVudGltZQBWYXJpYWJsZXMAZ2V0X1ZhcmlhYmxlcwBWYXJpYWJsZQBnZXRfSXRlbQBD
+b252ZXJzaW9ucwBNb250aE5hbWUAU3RyaW5nAENvbmNhdABzZXRfVGFza1Jlc3VsdABDTFNDb21w
+bGlhbnRBdHRyaWJ1dGUAU1NJU1NjcmlwdFRhc2tFbnRyeVBvaW50QXR0cmlidXRlAENvbXBpbGF0
+aW9uUmVsYXhhdGlvbnNBdHRyaWJ1dGUAUnVudGltZUNvbXBhdGliaWxpdHlBdHRyaWJ1dGUAU3lz
+dGVtLlJ1bnRpbWUuVmVyc2lvbmluZwBUYXJnZXRGcmFtZXdvcmtBdHRyaWJ1dGUAU2NyaXB0VGFz
+a19kMzM2MWQwMTZmYjA0ZDAyYjEyOTI0NDM2ODhkYWJiMi5kbGwAACFTAGEAdgBlAEYAaQBsAGUA
+RgB1AGwAbABOAGEAbQBlAAARUwBhAHYAZQBGAGkAbABlAABFTgBJADAAMAAwADEAUwBPAFQASABJ
+ACAAQwBlAG4AdABlAG4AZQAgAEsAUwAgAEMAYQBsAGwAIABTAHQAYQB0AHMAXwAACS4AeABsAHMA
+AAAAACtJdQg160lHgKoG36o0rxMACLd6XFYZNOCJCLA/X38R1Qo6AyAAAQMAAAEEAAASDAcGFRIY
+ARIMBAAAEggHBhUSGAESCAQAABIRBwYVEhgBEhEEAAASFAcGFRIYARIUBAgAEgwECAASCAQIABIR
+BAgAEhQEIAECHAMgAAgEIAASFQMgAA4CHgAHEAEBHgAeAAcwAQEBEB4AAhMABCAAEwAHBhUSGQET
+AAQoABMACImEXc2AgMyRAgYIAwYRIAQAAAAABAEAAAAFIAEBESkIAQABAAAAAAAFIAIBDg4YAQAK
+TXlUZW1wbGF0ZQgxMC4wLjAuMAAABhUSGAESDAYVEhgBEggGFRIYARIRBhUSGAESFAQHARIMBAcB
+EggEBwESEQQHARIUBCABAQ4QAQALTXkuQ29tcHV0ZXIAAAwBAAdNeS5Vc2VyAAATAQAOTXkuV2Vi
+U2VydmljZXMAABMBAA5NeS5BcHBsaWNhdGlvbgAABAABHBwDBwECAwcBCAYAARIVEUUEBwESFQMH
+AQ4FEAEAHgAECgEeAAQHAR4AByAEAQ4ODg5hAQA0U3lzdGVtLldlYi5TZXJ2aWNlcy5Qcm90b2Nv
+bHMuU29hcEh0dHBDbGllbnRQcm90b2NvbBJDcmVhdGVfX0luc3RhbmNlX18TRGlzcG9zZV9fSW5z
+dGFuY2VfXwAAAAYVEhgBEwAGFRIZARMABAoBEwAFIAEBEwAIBwMTABMAEwAEIAEBAgUBAAAAAAQA
+ABFZBQABCBFZBCAAEl0EIAASYQUgARJlHAMgABwEAAEOHAUAAg4IAgcABA4ODg4OBCABARwEIAEB
+CAgBAAgAAAAAAB4BAAEAVAIWV3JhcE5vbkV4Y2VwdGlvblRocm93cwFHAQAaLk5FVEZyYW1ld29y
+ayxWZXJzaW9uPXY0LjABAFQOFEZyYW1ld29ya0Rpc3BsYXlOYW1lEC5ORVQgRnJhbWV3b3JrIDTA
+MwAAAAAAAAAAAADeMwAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA0DMAAAAAAAAAAAAAAAAAAAAA
+X0NvckRsbE1haW4AbXNjb3JlZS5kbGwAAAAAAP8lACAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAQAQAAAAGAAAgAAAAAAAAAAAAAAAAAAAAQABAAAAMAAAgAAAAAAAAAAAAAAAAAAAAQAAAAAA
+SAAAAFhAAADUAgAAAAAAAAAAAADUAjQAAABWAFMAXwBWAEUAUgBTAEkATwBOAF8ASQBOAEYATwAA
+AAAAvQTv/gAAAQAAAAAAAAAAAAAAAAAAAAAAPwAAAAAAAAAEAAAAAgAAAAAAAAAAAAAAAAAAAEQA
+AAABAFYAYQByAEYAaQBsAGUASQBuAGYAbwAAAAAAJAAEAAAAVAByAGEAbgBzAGwAYQB0AGkAbwBu
+AAAAAAAAALAENAIAAAEAUwB0AHIAaQBuAGcARgBpAGwAZQBJAG4AZgBvAAAAEAIAAAEAMAAwADAA
+MAAwADQAYgAwAAAALAACAAEARgBpAGwAZQBEAGUAcwBjAHIAaQBwAHQAaQBvAG4AAAAAACAAAAAw
+AAgAAQBGAGkAbABlAFYAZQByAHMAaQBvAG4AAAAAADAALgAwAC4AMAAuADAAAACAADAAAQBJAG4A
+dABlAHIAbgBhAGwATgBhAG0AZQAAAFMAYwByAGkAcAB0AFQAYQBzAGsAXwBkADMAMwA2ADEAZAAw
+ADEANgBmAGIAMAA0AGQAMAAyAGIAMQAyADkAMgA0ADQAMwA2ADgAOABkAGEAYgBiADIALgBkAGwA
+bAAAACgAAgABAEwAZQBnAGEAbABDAG8AcAB5AHIAaQBnAGgAdAAAACAAAACIADAAAQBPAHIAaQBn
+AGkAbgBhAGwARgBpAGwAZQBuAGEAbQBlAAAAUwBjAHIAaQBwAHQAVABhAHMAawBfAGQAMwAzADYA
+MQBkADAAMQA2AGYAYgAwADQAZAAwADIAYgAxADIAOQAyADQANAAzADYAOAA4AGQAYQBiAGIAMgAu
+AGQAbABsAAAANAAIAAEAUAByAG8AZAB1AGMAdABWAGUAcgBzAGkAbwBuAAAAMAAuADAALgAwAC4A
+MAAAADgACAABAEEAcwBzAGUAbQBiAGwAeQAgAFYAZQByAHMAaQBvAG4AAAAwAC4AMAAuADAALgAw
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAADAAAAPAzAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==</BinaryItem>
+            </ScriptProject>
+          </DTS:ObjectData>
+        </DTS:Executable>
+        <DTS:Executable DTS:refId="Package\Sequence Container\Send Email" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:DelayValidation="True" DTS:Description="Execute SQL Task" DTS:DTSID="{5473FE96-E3CC-44A3-AD6D-06652801EFD9}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="Send Email" DTS:TaskContact="Execute SQL Task; Microsoft Corporation; Microsoft SQL Server v9; © 2004 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1" DTS:ThreadHint="0">
+          <DTS:Variables/>
+          <DTS:ObjectData>
+            <SQLTask:SqlTaskData SQLTask:Connection="{E5B4BC3B-F1EE-4F09-9D88-2C21F5B61AE8}" SQLTask:SqlStatementSource="select AccountIdentifier as resAccountIdentifier&#xA;          ,EmailAddresses as resEmailAddresses&#xA;          ,case EmailAddressesCC  when 'NA' Then ''&#xA;           when 'n/a' Then ''&#xA;            else EmailAddressesCC &#xA;            end  as resEmailAddressesCC&#xA;          ,case EmailAddressesBCC  when 'NA' Then ''&#xA;  when 'n/a' Then ''&#xA;            else EmailAddressesBCC &#xA;            end  as resEmailAddressesBCC&#xA;         ,QAEmailAddresses as resQAEmailAddresses&#xA;         ,Frequency as resFrequency&#xA;         ,Approval as resApproval&#xA;      FROM [ASDUtilityReports].[dbo].[SSISEmailDistributionList]&#xA;where ReportID='NI0001SOTHI Centene KS Call Stats'" SQLTask:ResultType="ResultSetType_SingleRow" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask">
+              <SQLTask:ResultBinding SQLTask:ResultName="resAccountIdentifier" SQLTask:DtsVariableName="User::AccountIdentifier"/>
+              <SQLTask:ResultBinding SQLTask:ResultName="resEmailAddresses" SQLTask:DtsVariableName="User::EmailAddresses"/>
+              <SQLTask:ResultBinding SQLTask:ResultName="resEmailAddressesCC" SQLTask:DtsVariableName="User::EmailAddressesCC"/>
+              <SQLTask:ResultBinding SQLTask:ResultName="resEmailAddressesBCC" SQLTask:DtsVariableName="User::EmailAddressesBCC"/>
+              <SQLTask:ResultBinding SQLTask:ResultName="resQAEmailAddresses" SQLTask:DtsVariableName="User::QAEmailAddresses"/>
+              <SQLTask:ResultBinding SQLTask:ResultName="resFrequency" SQLTask:DtsVariableName="User::Frequency"/>
+              <SQLTask:ResultBinding SQLTask:ResultName="resApproval" SQLTask:DtsVariableName="User::Approval"/>
+              <SQLTask:ParameterBinding SQLTask:ParameterName="0" SQLTask:DtsVariableName="User::ReportID" SQLTask:ParameterDirection="Input" SQLTask:DataType="129" SQLTask:ParameterSize="-1"/>
+            </SQLTask:SqlTaskData>
+          </DTS:ObjectData>
+        </DTS:Executable>
+      </DTS:Executables>
+      <DTS:PrecedenceConstraints>
+        <DTS:PrecedenceConstraint DTS:refId="Package\Sequence Container.PrecedenceConstraints[Constraint]" DTS:CreationName="" DTS:DTSID="{3FCA81E4-F931-42DD-B3B2-47A8349A37D7}" DTS:From="Package\Sequence Container\Script Task" DTS:LogicalAnd="True" DTS:ObjectName="Constraint" DTS:To="Package\Sequence Container\File System Task"/>
+        <DTS:PrecedenceConstraint DTS:refId="Package\Sequence Container.PrecedenceConstraints[Constraint 1]" DTS:CreationName="" DTS:DTSID="{9C14CBAB-92AE-45AB-A1F9-7D77F7EBA772}" DTS:From="Package\Sequence Container\File System Task" DTS:LogicalAnd="True" DTS:ObjectName="Constraint 1" DTS:To="Package\Sequence Container\Execute SQL Main Q"/>
+        <DTS:PrecedenceConstraint DTS:refId="Package\Sequence Container.PrecedenceConstraints[Constraint 2]" DTS:CreationName="" DTS:DTSID="{1372CBA4-7C08-4574-B8F2-2018A7F70EA8}" DTS:From="Package\Sequence Container\Data Flow Task" DTS:LogicalAnd="True" DTS:ObjectName="Constraint 2" DTS:To="Package\Sequence Container\Send Email"/>
+        <DTS:PrecedenceConstraint DTS:refId="Package\Sequence Container.PrecedenceConstraints[Constraint 3]" DTS:CreationName="" DTS:DTSID="{2DD7FEB1-E927-44D8-A991-70B5E71264F0}" DTS:From="Package\Sequence Container\Execute SQL Main Q" DTS:LogicalAnd="True" DTS:ObjectName="Constraint 3" DTS:To="Package\Sequence Container\Data Flow Task"/>
+      </DTS:PrecedenceConstraints>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Constraint]" DTS:CreationName="" DTS:DTSID="{031F41E6-2643-4615-BBAA-9D3795535EE9}" DTS:EvalOp="1" DTS:Expression="@Approval==&quot;T&quot;" DTS:From="Package\Sequence Container" DTS:LogicalAnd="True" DTS:ObjectName="Constraint" DTS:To="Package\Send Mail Task"/>
+    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Constraint 1]" DTS:CreationName="" DTS:DTSID="{6320FCEC-DAA7-4D7B-AAB3-D80639E87C76}" DTS:EvalOp="1" DTS:Expression="@Approval==&quot;F&quot;" DTS:From="Package\Sequence Container" DTS:LogicalAnd="True" DTS:ObjectName="Constraint 1" DTS:To="Package\Send Mail Task QA"/>
+  </DTS:PrecedenceConstraints>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--This CDATA section contains the layout information of the package. The section includes information such as (x,y) coordinates, width, and height.-->
+<!--If you manually edit this section and make a mistake, you can delete it. -->
+<!--The package will still be able to load normally but the previous layout information will be lost and the designer will automatically re-arrange the elements on the design surface.-->
+<Objects
+  Version="sql12">
+  <!--Each node below will contain properties that do not affect runtime behavior.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="16" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        <NodeLayout
+          Size="130,47"
+          Id="Package\Send Mail Task"
+          TopLeft="341.27358490566,133.933962264151" />
+        <NodeLayout
+          Size="131,48"
+          Id="Package\Send Mail Task QA"
+          TopLeft="344.858490566038,290.160377358491" />
+        <NodeLayout
+          Size="137,45"
+          Id="Package\Sequence Container\Data Flow Task"
+          TopLeft="52,242.867924528302" />
+        <NodeLayout
+          Size="141,42"
+          Id="Package\Sequence Container\Execute SQL Main Q"
+          TopLeft="45.3773584905661,173.132075471698" />
+        <NodeLayout
+          Size="139,45"
+          Id="Package\Sequence Container\File System Task"
+          TopLeft="40.0377358490566,90.6037735849057" />
+        <NodeLayout
+          Size="109,44"
+          Id="Package\Sequence Container\Script Task"
+          TopLeft="51.4150943396227,21.6792452830189" />
+        <NodeLayout
+          Size="109,44"
+          Id="Package\Sequence Container\Send Email"
+          TopLeft="64.696540886712,326.874213681506" />
+        <EdgeLayout
+          Id="Package\Sequence Container.PrecedenceConstraints[Constraint]"
+          TopLeft="107.72641509434,65.6792452830189">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,24.9245283018868"
+              Start="0,0"
+              End="0,17.4245283018868">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,17.4245283018868" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Sequence Container.PrecedenceConstraints[Constraint 1]"
+          TopLeft="112.707547169811,135.603773584906">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,37.5283018867923"
+              Start="0,0"
+              End="0,30.0283018867923">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,30.0283018867923" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Sequence Container.PrecedenceConstraints[Constraint 2]"
+          TopLeft="119.848270443356,287.867924528302">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,39.006289153204"
+              Start="0,0"
+              End="0,31.506289153204">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,31.506289153204" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Sequence Container.PrecedenceConstraints[Constraint 3]"
+          TopLeft="118.188679245283,215.132075471698">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,27.735849056604"
+              Start="0,0"
+              End="0,20.235849056604">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,20.235849056604" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <ContainerLayout
+          HeaderHeight="43"
+          IsExpanded="True"
+          PanelSize="215,426"
+          Size="215,469"
+          Id="Package\Sequence Container"
+          TopLeft="5.5,5.5" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint]"
+          TopLeft="220.5,160.300314465409">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="120.77358490566,0"
+              Start="0,0"
+              End="113.27358490566,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="113.27358490566,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="48.63679245283,5,16,16"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Constraint 1]"
+          TopLeft="220.5,315.496855345912">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="124.358490566038,0"
+              Start="0,0"
+              End="116.858490566038,0">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="116.858490566038,0" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <mssgm:EdgeLabel
+              BoundingBox="50.429245283019,5,16,16"
+              RelativePosition="Any" />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+  <TaskHost
+    design-time-name="Package\Sequence Container\Data Flow Task">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="16" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="109,35"
+          Id="Package\Sequence Container\Data Flow Task\OLE DB Source Monthly"
+          TopLeft="5.5,6.29245283018868" />
+        <NodeLayout
+          Size="109,35"
+          Id="Package\Sequence Container\Data Flow Task\OLE DB Source YTD"
+          TopLeft="135.72641509434,5.5" />
+        <NodeLayout
+          Size="109,35"
+          Id="Package\Sequence Container\Data Flow Task\Excel Destination 1"
+          TopLeft="132.556603773585,100.556603773585" />
+        <NodeLayout
+          Size="109,35"
+          Id="Package\Sequence Container\Data Flow Task\Excel Destination"
+          TopLeft="8.74528301886794,108.518867924528" />
+        <NodeLayout
+          Size="109,35"
+          Id="Package\Sequence Container\Data Flow Task\Data Conversion 1"
+          TopLeft="134.141509433962,53.4245283018868" />
+        <NodeLayout
+          Size="109,35"
+          Id="Package\Sequence Container\Data Flow Task\Data Conversion"
+          TopLeft="7.91509433962266,53.4245283018868" />
+        <EdgeLayout
+          Id="Package\Sequence Container\Data Flow Task.Paths[OLE DB Source Output]"
+          TopLeft="190.028301886792,40.6320754716981">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="-1.58490566037739,12.7924528301887"
+              Start="0,0"
+              End="-1.58490566037739,5.29245283018869">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,6.37735849056605" />
+                  <mssgle:LineSegment
+                    End="-1.58490566037739,6.37735849056605" />
+                  <mssgle:LineSegment
+                    End="-1.58490566037739,5.29245283018869" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Sequence Container\Data Flow Task.Paths[OLE DB Source Output1]"
+          TopLeft="59.8018867924528,41.4245283018868">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="2.41509433962264,12"
+              Start="0,0"
+              End="2.41509433962264,4.50000000000001">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,6.00000000000001" />
+                  <mssgle:LineSegment
+                    End="2.41509433962264,6.00000000000001" />
+                  <mssgle:LineSegment
+                    End="2.41509433962264,4.50000000000001" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Sequence Container\Data Flow Task.Paths[Data Conversion Output]"
+          TopLeft="188.443396226415,88.5566037735849">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="-1.58490566037733,12"
+              Start="0,0"
+              End="-1.58490566037733,4.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,6" />
+                  <mssgle:LineSegment
+                    End="-1.58490566037733,6" />
+                  <mssgle:LineSegment
+                    End="-1.58490566037733,4.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Sequence Container\Data Flow Task.Paths[Data Conversion Output1]"
+          TopLeft="62.2169811320755,88.5566037735849">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0.830188679245282,19.9622641509434"
+              Start="0,0"
+              End="0.830188679245282,12.4622641509434">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,9.96226415094338" />
+                  <mssgle:LineSegment
+                    End="0.830188679245282,9.96226415094338" />
+                  <mssgle:LineSegment
+                    End="0.830188679245282,12.4622641509434" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </TaskHost>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>
