@@ -1,0 +1,132 @@
+with q1 as (SELECT RADAUTHCLINICALALGORITHMGRPKEY,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM THEN regexp_replace(actiontext, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END) AS QUESTION1, --Updated by Chris
+                
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM THEN regexp_replace(RESPONSETEXT, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS ANSWER1,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+1 THEN regexp_replace(actiontext, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS QUESTION2,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+1 THEN regexp_replace(RESPONSETEXT, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS ANSWER2,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+2 THEN regexp_replace(actiontext, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS QUESTION3,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+2 THEN regexp_replace(RESPONSETEXT, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS ANSWER3,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+3 THEN regexp_replace(actiontext, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS QUESTION4,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+3 THEN regexp_replace(RESPONSETEXT, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS ANSWER4,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+4 THEN regexp_replace(actiontext, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS QUESTION5,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+4 THEN regexp_replace(RESPONSETEXT, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS ANSWER5,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+5 THEN regexp_replace(actiontext, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS QUESTION6,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+5 THEN regexp_replace(RESPONSETEXT, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS ANSWER6,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+6 THEN regexp_replace(actiontext, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS QUESTION7,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+6 THEN regexp_replace(RESPONSETEXT, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS ANSWER7,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+7 THEN regexp_replace(actiontext, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS QUESTION8,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+7 THEN regexp_replace(RESPONSETEXT, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS ANSWER8,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+8 THEN regexp_replace(actiontext, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS QUESTION9,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+8 THEN regexp_replace(RESPONSETEXT, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS ANSWER9,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+9 THEN regexp_replace(actiontext, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS QUESTION10,
+             MAX (
+                CASE
+                   WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+9 THEN regexp_replace(RESPONSETEXT, '[^a-z_A-Z &,%:@().?:0123456789-]')
+                   ELSE NULL
+                END)
+                AS ANSWER10,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+10 THEN regexp_replace(actiontext, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS QUESTION11,
+             MAX (
+                CASE
+                   WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+10 THEN regexp_replace(RESPONSETEXT, '[^a-z_A-Z &,%:@().?:0123456789-]')
+                   ELSE NULL
+                END)
+                AS ANSWER11,
+             MAX (
+                CASE WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+11 THEN regexp_replace(actiontext, '[^a-z_A-Z &,%:@().?:0123456789-]') ELSE NULL END)
+                AS QUESTION12,
+             MAX (
+                CASE
+                   WHEN ACTIONSEQUENCENUM = MINACTIONSEQUENCENUM+11 THEN regexp_replace(RESPONSETEXT, '[^a-z_A-Z &,%:@().?:0123456789-]')
+                   ELSE NULL
+                END)
+                AS ANSWER12
+        FROM (  SELECT bdg.RADAUTHCLINICALALGORITHMGRPKEY,
+                       Q2.MINACTIONSEQUENCENUM,
+                       ACTIONSEQUENCENUM,
+                       ACTIONTEXT,
+                       RESPONSETEXT
+                  FROM    DW_RAD.DIMRADAUTHCLINICALALGORITHMBDG BDG
+                       INNER JOIN
+                          DW_RAD.DIMRADAUTHCLINICALALGORITHM RAD
+                       ON BDG.RADAUTHCLINICALALGORITHMKEY =
+                             RAD.RADAUTHCLINICALALGORITHMKEY
+                       INNER JOIN 
+                               (SELECT RADAUTHCLINICALALGORITHMGRPKEY,
+                       MIN(ACTIONSEQUENCENUM) AS MINACTIONSEQUENCENUM
+                  FROM    DW_RAD.DIMRADAUTHCLINICALALGORITHMBDG BDG
+                       INNER JOIN
+                          DW_RAD.DIMRADAUTHCLINICALALGORITHM RAD
+                       ON BDG.RADAUTHCLINICALALGORITHMKEY =
+                             RAD.RADAUTHCLINICALALGORITHMKEY
+                   GROUP BY RADAUTHCLINICALALGORITHMGRPKEY) Q2
+                   ON BDG.RADAUTHCLINICALALGORITHMGRPKEY = Q2.RADAUTHCLINICALALGORITHMGRPKEY
+              ORDER BY RADAUTHCLINICALALGORITHMGRPKEY, ACTIONSEQUENCENUM) Q1
+    GROUP BY RADAUTHCLINICALALGORITHMGRPKEY)
+    
+    select RADAUTHCLINICALALGORITHMGRPKEY,case when RADAUTHCLINICALALGORITHMGRPKEY>0 then 'Positive Algorithm Keys' else 'Negative Algorithm Keys' end as AlgorithmKeySubGroup, 
+                NVL(QUESTION1,'End') as QUESTION1,
+                NVL(ANSWER1,'End') as ANSWER1,
+                NVL(QUESTION2,'End') as QUESTION2,
+                NVL(ANSWER2,'End') as ANSWER2,
+                NVL(QUESTION3,'End') as QUESTION3,
+                NVL(ANSWER3,'End') as ANSWER3,
+                NVL(QUESTION4,'End') as QUESTION4,
+                NVL(ANSWER4,'End') as ANSWER4,
+                NVL(QUESTION5,'End') as QUESTION5,
+                NVL(ANSWER5,'End') as ANSWER5,
+                NVL(QUESTION6,'End') as QUESTION6,
+                NVL(ANSWER6,'End') as ANSWER6,
+                NVL(QUESTION7,'End') as QUESTION7,
+                NVL(ANSWER7,'End') as ANSWER7,
+                NVL(QUESTION8,'End') as QUESTION8,
+                NVL(ANSWER8,'End') as ANSWER8,
+                NVL(QUESTION9,'End') as QUESTION9,
+                NVL(ANSWER9,'End') as ANSWER9,
+                NVL(QUESTION10,'End') as QUESTION10,
+                NVL(ANSWER10,'End') as ANSWER10,
+                NVL(QUESTION11,'End') as QUESTION11,
+                NVL(ANSWER11,'End') as ANSWER11,
+                NVL(QUESTION12,'End') as QUESTION12,
+                NVL(ANSWER12,'End') as ANSWER12
+                
+FROM q1

@@ -1,0 +1,398 @@
+/*************************************************************************************************************************
+* Requested By:			Staci Barnett
+* Request Due Date:		02/02/17
+* Request Received:		02/01/17
+* Created By:			Michelle Boggs
+* Create Date:			02/01/17
+* Last Modified Date:	
+* Last Modified By:		
+* Adhoc #:				 
+* Report Name:			HMSA Denial Rates
+* Report Description:	HMSA
+*						Could you add to the denial rate by month tab the % of requests from 
+*						gold carded physicians?
+*
+*						Guessing that has picked up over the last several months and may be a driver 
+*						of the reduction in cases to the PCR.
+*
+*************************************************************************************************************************/
+
+USE  ASDReportDB
+
+DROP TABLE  #temp1
+DROP TABLE  #temp2
+DROP TABLE  #temp3
+DROP TABLE  #temp_action
+DROP TABLE  #temp_status
+DROP TABLE  #temp_info
+DROP TABLE  #temp_P2P
+DROP TABLE  #temp_touch
+
+
+DECLARE		@start_date datetime,
+			@end_date datetime,
+			@car_id varchar(10)
+
+SET			@start_date = '01/01/2017'      
+SET			@end_date	= '09/30/2019'
+SET			@car_id = '54'
+
+
+---------------------------------------------------------------------------------------------------
+
+SELECT      a.car_id,
+			a.auth_id,
+			a.authorization_type_id,
+			a.combo_flag,
+			a.expedite_flag,
+			a.proc_desc,
+			a.cpt4_code,
+			a.case_id,
+			ads.data as 'case_id_2',
+			auth_origin = case when a.is_user_id = 1998 then 'RadMD' else 'Call Center' end,
+			a.date_call_rcvd,
+			aschg.date_changed as 'final_determination_date',
+			ascd.auth_outcome,
+			ascd.status_desc,
+
+---------------------------------------------- New UM Terminology --------------
+	case
+			when cd.customer_group_determination_code in ('1','5')	then 'Certified'
+			when cd.customer_group_determination_code in ('2','6')	then 'Non-Certified'
+			when cd.customer_group_determination_code = '3'			then 'Administrative Non-Certified'
+			when cd.customer_group_determination_code = '4'			then 'Inactivated by Ordering Provider'
+			when cd.customer_group_determination_code in ('7','8')	then 'Partial Determination'
+			else 'Other'
+	end as 'final_determination',
+	case	when ascd.auth_outcome <> 'A' and ascd.auth_status_type in ('C','R') then 'Clinical Denial'
+			when ascd.auth_outcome <> 'A' and ascd.auth_status_type = 'A' then 'Admin Denial'
+			when ascd.auth_outcome = 'A' then 'Approval'
+			else null
+			end as 'final_outcome_category',
+			iut.report_level as 'level_of_determination',	 
+			a.phys_id,
+			p.tax_id as provider_tax_id,
+		   (upper(p.lname) + ', ' + upper(p.fname)) as 'physician_name',
+		   sp.spec_name,
+	Gold_Card_flag = case when exists (
+                                    select phys_id from niacombine.phys_review_nia pr
+                                    where pr.phys_id = a.phys_id and
+										  pr.car_id = a.car_id and
+                                          (pr.auto_auth_flag = 1 or pr.limited_auto_auth_flag = 1
+                                          or pr.post_caseqa_auto_auth_criteria_id is not NULL)
+                                    and a.date_call_rcvd >= pr.review_start_date and
+                          (a.date_call_rcvd <= pr.review_end_date or pr.review_end_date is null))
+                              and a.case_outcome in ('Approve - Automatic Authorization','Approved - Automatic Authorization', 'Case Questions Bypassed','Approved - Case Questions Bypassed') 
+                             -- and aal.auth_action_code is null
+                              then 1
+                              else 0
+                              end,	   
+			a.fac_id as facility_id,
+			a.member_id
+			
+INTO		#temp1
+
+FROM	    niacombine.authorizations_nia a with (nolock) 
+			join niacombine.auth_status_change_nia aschg WITH (NOLOCK) on (a.auth_id = aschg.auth_id AND A.CAR_ID = ASCHG.CAR_ID)
+            join niacore..auth_status_codes ascd WITH (NOLOCK) on (aschg.new_auth_status = ascd.auth_status)
+            join niacombine.physicians_nia p with (NOLOCK) on (a.phys_id = p.phys_id and a.car_id = p.car_id)
+            left join niacore..specialties sp with (nolock) on (p.spec_id = sp.spec_id)
+            join nirad..facilities f with (NOLOCK) on (f.fac_id = a.fac_id)
+				
+---------------------------------------------- New UM Terminology ----------------
+			left join niacore..um_decision_codes d with (nolock) on (ascd.um_decision_code = d.um_decision_code)
+			left join niacore..um_process_codes pc with (nolock) on (ascd.um_process_code = pc.um_process_code)
+			left join niacore..benefit_determination_codes b with (nolock) on (ascd.benefit_determination_code = b.benefit_determination_code)
+			left join niacore..Customer_Determination_Codes cd with (nolock) on (ascd.customer_determination_code = cd.customer_determination_code)
+			left join niacore..Customer_Group_Determination_Codes cgd with (nolock) on (cd.customer_group_determination_code = cgd.customer_group_determination_code)
+----------------------------------------------------------------------------------
+            left join niacore..is_users isu with (nolock) on (aschg.user_name = isu.log_id)
+	        left join niacore..is_user_types iut with (nolock) on (isu.type = iut.user_type)
+			left join ASDReportDB.niacombine.authorization_data_supplemental_nia ads with(nolock) on (a.car_id = ads.car_id and a.auth_id = ads.auth_id and ads.data_type_id = 218)
+			--left join niacombine.auth_action_log_nia aal with (nolock) on (a.auth_id = aal.auth_id and a.car_id = aal.car_id and aal.auth_action_code = '499')
+	
+WHERE		ascd.final_status_flag = 1 
+			and aschg.date_changed = (select max(aschg1.date_changed) 
+                            from ASDReportDB.niacombine.auth_status_change_nia aschg1 WITH (NOLOCK)
+                            where aschg1.auth_id = a.auth_id and a.car_id = aschg1.car_id and 
+                           exists (select 'true'
+                                   from niacore..auth_status_codes ascd1 WITH (NOLOCK)
+                                   where aschg1.new_auth_status = ascd1.auth_status and
+                                                            aschg1.car_id = a.car_id and 
+                                         ascd1.final_status_flag = 1) and
+                                         aschg1.date_changed >= @start_date and 
+                                         aschg1.date_changed < dateadd(dd, 1, @end_date)) 
+			and aschg.date_changed >= @start_date
+			and aschg.date_changed < dateadd(dd,1,@end_date) 
+			and a.car_id = @car_id
+			and a.authorization_type_id in ('1','2')
+			
+
+--select * from #temp1 where case_id = '1'
+--select distinct physician_fax from #temp where physician_fax like '%5070%' order by physician_fax
+
+---------------------------------------------------------------------------------------------------
+
+--Get Member Info
+
+SELECT      t.car_id,
+			hc.car_name,
+			hp.plan_id,
+			hp.plan_name,
+			hp.line_of_business,
+			hp.funding_risk_type,
+			t.auth_id,
+			t.authorization_type_id,
+			t.combo_flag,
+			t.expedite_flag,
+			t.proc_desc,
+			exam_cat_desc,
+			ec.short_desc,
+			t.cpt4_code,
+			t.case_id,
+			t.case_id_2,
+			cpt.cpt4_descr,
+			t.auth_origin,
+			t.date_call_rcvd,
+			t.final_determination_date, 
+			t.auth_outcome,
+			t.status_desc,
+			t.final_determination,
+			t.final_outcome_category,
+			t.level_of_determination,
+			t.phys_id,
+			t.provider_tax_id,
+			t.physician_name,
+			t.spec_name,
+			t.gold_card_flag,
+			m.client_member_id,
+			m.member_id
+
+INTO		#temp2
+
+FROM	    #temp1 t
+			join niacombine.members_nia m WITH (NOLOCK) on (t.member_id = m.member_id and t.car_id = m.car_id)
+            join niacore..health_plan hp WITH (NOLOCK) on (m.plan_id = hp.plan_id and m.car_id = hp.car_id)
+            join niacore..health_carrier hc WITH (NOLOCK) on (t.car_id = hc.car_id)
+            left join niacore..cpt4_codes cpt WITH (NOLOCK) on (t.cpt4_code = cpt.cpt4_code) 
+            left join niacore..exam_category ec WITH (NOLOCK) on (cpt.exam_cat_id = ec.exam_cat_id) 
+            
+
+--select count(*) from #temp2
+--select distinct case_id, case_id_2, proc_desc from #temp2 where case_id in ('1','2','13','20','48','88','429','438','790')
+------------------------------------------------------------------------------------------------------------------------
+-- Get Fast Pass Flag
+
+SELECT DISTINCT	t.car_id,
+				t.auth_id,
+				t.phys_id,
+				t.date_call_rcvd,
+				Fast_Pass_flag = 1
+
+INTO		#temp_fp
+
+FROM		#temp2 t
+			join NiaCombine.phys_review_NIA pr with (nolock) on (t.car_id = pr.car_id and t.phys_id = pr.phys_id and pr.phys_flag_group_id = '10')
+
+WHERE	   (t.date_call_rcvd >= pr.review_start_date 
+	and    (t.date_call_rcvd <= pr.review_end_date or pr.review_end_date is null))
+
+--drop table #temp_fp
+--select * from #temp_fp where date_call_rcvd < '03/16/2019'
+--select * from #temp_fp where phys_id in ('275','276','338','1464','1465')
+---------------------------------------------------------------------------------------------------
+-- Get Limited old Card Flag
+
+SELECT DISTINCT	t.car_id,
+				t.auth_id,
+				t.phys_id,
+				t.case_id,
+				t.proc_desc,
+				t.date_call_rcvd,
+				Limited_Gold_Card_flag = 1
+
+INTO		#temp_lgc
+
+FROM		#temp2 t
+			join NiaCombine.phys_review_NIA pr with (nolock) on (t.car_id = pr.car_id and t.phys_id = pr.phys_id and pr.phys_flag_group_id = '5')
+			join niacore..phys_flags pf with (nolock) on (t.car_id = pf.car_id and pr.phys_flag_group_id = pf.phys_flag_group_id and t.case_id = pf.case_id)
+
+WHERE	   (t.date_call_rcvd >= pr.review_start_date 
+	and    (t.date_call_rcvd <= pr.review_end_date or pr.review_end_date is null)
+	and     t.date_call_rcvd >= pf.date_active
+	and    (t.date_call_rcvd <= pf.date_inactive or pf.date_inactive is null))
+
+--drop table #temp_lgc
+--select distinct proc_desc, case_id from #temp_lgc
+--select * from #temp_lgc
+--select * from #temp_fp where date_call_rcvd < '03/16/2019'
+--select * from #temp_fp where phys_id in ('275','276','338','1464','1465')
+--select phys_id, max(date_call_rcvd) as 'max_date' from #temp_lgc where phys_id in ('53786','139677','183435','160557','113209') group by phys_id
+
+---------------------------------------------------------------------------------------------------
+--  Get data we need
+
+SELECT      t.car_id,
+			t.car_name,
+			t.plan_id,
+			t.plan_name,
+	case	when t.funding_risk_type = 2 then 'Risk' 
+			when t.funding_risk_type in ('5','6','7','8') then 'ASO Premium'
+			else 'ASO' end as 'funding_description',
+	case    when t.line_of_business = 'OT' then 'CO' else t.line_of_business end as 'line_of_business',
+			t.auth_id,
+			t.authorization_type_id,
+	case	when t.proc_desc like '% - %' then LEFT(t.proc_desc,charindex('-',t.proc_desc,0)-2)
+            when t.proc_desc like '% (%)' then LEFT(t.proc_desc,charindex('(',t.proc_desc,0)-2)
+            when t.proc_desc like '%(%' then LEFT(t.proc_desc,charindex('(',t.proc_desc,0)-1)
+            else t.proc_desc end as 'proc_desc',
+			t.expedite_flag,
+			t.final_determination_date,
+			final_determination_year = convert(varchar,datepart(yyyy,t.final_determination_date)),
+			final_determination_month = case 
+				when datepart(mm,t.final_determination_date) between 1 and 9
+				then convert(varchar,0)+convert(varchar,datepart(mm,t.final_determination_date))
+				else convert(varchar,datepart(mm,t.final_determination_date)) 
+				end,
+			t.level_of_determination,
+			t.final_outcome_category,
+			t.gold_card_flag,
+	case    when fp.Fast_Pass_flag = 1 then 1 else 0 end as 'fast_pass_flag',
+	case    when lgc.Limited_Gold_Card_flag = 1 then 1 else 0 end as 'limited_gold_card_flag',
+			t.phys_id,
+			t.provider_tax_id,
+			t.physician_name
+			
+INTO		#temp3
+
+FROM	    #temp2 t
+			left join #temp_fp fp with (nolock) on (t.car_id = fp.car_id and t.auth_id = fp.auth_id)	
+			left join #temp_lgc lgc with (nolock) on (t.car_id = lgc.car_id and t.auth_id = lgc.auth_id)	
+			
+			
+--select * from #temp3         
+--select distinct physician_name from #temp2 order by physician_name
+--drop table #temp3
+---------------------------------------------------------------------------------------------------
+--  Set more flags
+
+SELECT      t.car_id,
+			t.car_name,
+	case	when t.funding_description = 'Risk' then 'Risk' else 'All Other' end as 'risk_other',
+			t.funding_description,
+			t.line_of_business,
+			t.plan_id,
+			t.plan_name,
+			t.auth_id,
+			t.authorization_type_id,
+			t.proc_desc,
+			t.expedite_flag,
+			t.final_determination_date,
+			t.final_determination_year,
+			t.final_determination_month,
+	case    when (t.final_determination_year = '2019' and t.final_determination_month >= '05' and t.final_determination_month <= '07') then 'May-Jul 2019' else 'Other' end as 'recent_months_flag',
+			t.level_of_determination,
+			t.final_outcome_category,
+			t.gold_card_flag,
+			t.fast_pass_flag,
+			t.limited_gold_card_flag,
+	case    when (t.gold_card_flag = 1 or t.fast_pass_flag = 1 or t.limited_gold_card_flag = 1) then 1 else 0 end as 'overall_gold_card_flag',
+			t.phys_id,
+			t.provider_tax_id,
+			t.physician_name
+			
+INTO		#temp4
+
+FROM	    #temp3 t
+			
+			
+--select * from #temp4 where physician_name like '%EMMA%' order by physician_name
+--select distinct physician_name from #temp2 order by physician_name
+--drop table #temp4
+---------------------------------------------------------------------------------------------------
+
+--  Summarize Data
+
+SELECT		t.car_id,
+			t.car_name,
+			t.risk_other,
+			t.funding_description,
+			t.line_of_business,
+			t.authorization_type_id,
+			t.proc_desc,
+			t.expedite_flag,
+			t.final_determination_year,
+			t.final_determination_month,
+			t.recent_months_flag,
+			t.level_of_determination,
+			t.final_outcome_category,
+			t.gold_card_flag,
+			t.fast_pass_flag,
+			t.limited_gold_card_flag,
+			t.overall_gold_card_flag,
+			t.phys_id,
+			t.provider_tax_id,
+			t.physician_name,
+			count(*) as 'auth_count'
+
+FROM	    #temp4 t		
+			
+GROUP BY    t.car_id,
+			t.car_name,
+			t.risk_other,
+			t.funding_description,
+			t.line_of_business,
+			t.authorization_type_id,
+			t.proc_desc,
+			t.expedite_flag,
+			t.final_determination_year,
+			t.final_determination_month,
+			t.recent_months_flag,
+			t.level_of_determination,
+			t.final_outcome_category,
+			t.gold_card_flag,
+			t.fast_pass_flag,
+			t.limited_gold_card_flag,
+			t.overall_gold_card_flag,
+			t.phys_id,
+			t.provider_tax_id,
+			t.physician_name
+			
+				
+--select * from #temp3         
+--select distinct physician_name from #temp2 order by physician_name
+---------------------------------------------------------------------------------------------------
+-- Summarize data without Physician Name
+
+SELECT		t.final_determination_year,
+			t.final_determination_month,
+			t.funding_description,
+			t.line_of_business,
+			t.plan_id,
+			t.plan_name,
+			t.proc_desc,
+			t.expedite_flag,
+			t.gold_card_flag,
+			t.fast_pass_flag,
+			t.limited_gold_card_flag,
+			t.overall_gold_card_flag,
+			t.level_of_determination,
+			t.final_outcome_category,
+			count(*) as 'auth_count'
+
+FROM		#temp4 t
+
+GROUP BY	t.final_determination_year,
+			t.final_determination_month,
+			t.funding_description,
+			t.line_of_business,
+			t.plan_id,
+			t.plan_name,
+			t.proc_desc,
+			t.expedite_flag,
+			t.gold_card_flag,
+			t.fast_pass_flag,
+			t.limited_gold_card_flag,
+			t.overall_gold_card_flag,
+			t.level_of_determination,
+			t.final_outcome_category
